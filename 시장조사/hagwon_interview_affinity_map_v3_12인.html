@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원장·강사 인터뷰 어피니티 맵 · 12인 누적 보드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<style>
+:root{
+  --board:#E8EAEE;
+  --ink:#232833;
+  --ink-soft:#5A6272;
+  --line:#CDD2DB;
+  --a-bg:#FFE99A; --a-edge:#E8C94F; --a-tag:#8A6D00;
+  --b-bg:#FBD3DE; --b-edge:#EBA0B4; --b-tag:#9C3255;
+  --c-bg:#CDE4FB; --c-edge:#93BFEA; --c-tag:#1F5E9E;
+  --d-bg:#D3EFCF; --d-edge:#96CE8E; --d-tag:#2E6B2A;
+  --e-bg:#FFE0C2; --e-edge:#EFB77F; --e-tag:#8F5312;
+  --f-bg:#E4D9F7; --f-edge:#BBA3E3; --f-tag:#5B3E96;
+  --g-bg:#C9EDE4; --g-edge:#8ED0C0; --g-tag:#1D6B58;
+  --h-bg:#EAF2BC; --h-edge:#C4D97B; --h-tag:#5C6B14;
+  --i-bg:#FFD8CC; --i-edge:#EFA68F; --i-tag:#96412B;
+  --j-bg:#D9DFF9; --j-edge:#A4B0E8; --j-tag:#3A4B9E;
+  --k-bg:#EFE4D2; --k-edge:#D3BE99; --k-tag:#7A5F33;
+  --l-bg:#F2C9A8; --l-edge:#DD9B66; --l-tag:#8A4A18;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Pretendard',-apple-system,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle, #C7CCD6 1px, transparent 1.2px) 0 0/22px 22px,
+    var(--board);
+  min-height:100vh;
+  padding:28px 30px 80px;
+}
+header{max-width:1560px;margin:0 auto 10px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase}
+h1{font-size:27px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.sub{font-size:13.5px;color:var(--ink-soft);line-height:1.6;max-width:960px}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin:18px 0 6px}
+.who{
+  display:flex;gap:9px;align-items:flex-start;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px 9px 9px;
+  cursor:pointer;transition:box-shadow .15s;user-select:none;
+}
+.who:hover{box-shadow:0 3px 10px rgba(35,40,51,.10)}
+.who.dim{opacity:.35}
+.who .chip{width:15px;height:15px;border-radius:4px;flex:none;margin-top:2px;border:1px solid rgba(0,0,0,.15)}
+.who b{font-size:12.8px;display:block}
+.who span{font-size:11.3px;color:var(--ink-soft);line-height:1.42;display:block;margin-top:2px}
+.toolbar{max-width:1560px;margin:4px auto 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--ink-soft)}
+.hint kbd{background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:inherit;font-size:11px}
+.reset{font-size:12px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:6px;padding:5px 12px;cursor:pointer}
+.reset:hover{background:#F5F6F8}
+
+.wall{max-width:1560px;margin:0 auto;column-width:335px;column-gap:20px}
+.theme{
+  break-inside:avoid;display:inline-block;width:100%;margin:0 0 20px;
+  background:rgba(255,255,255,.66);
+  border:1px solid var(--line);border-radius:14px;padding:16px 14px 14px;
+  backdrop-filter:blur(2px);
+}
+.theme.dragover{outline:2px dashed #7C8598;outline-offset:-4px}
+.t-head{padding:0 4px 10px}
+.t-title{
+  font-family:'Nanum Pen Script',cursive;
+  font-size:26px;line-height:1.1;letter-spacing:0;
+}
+.t-title .cnt{
+  font-family:'Pretendard';font-size:11.5px;font-weight:700;color:var(--ink-soft);
+  background:#fff;border:1px solid var(--line);border-radius:20px;padding:2px 9px;
+  vertical-align:4px;margin-left:6px;
+}
+.t-note{font-size:12px;color:var(--ink-soft);line-height:1.55;margin-top:4px}
+.notes{display:flex;flex-direction:column;gap:10px;min-height:40px}
+
+.note{
+  border-radius:3px;padding:12px 13px 10px;
+  box-shadow:0 2px 5px rgba(35,40,51,.16), 0 8px 14px -8px rgba(35,40,51,.22);
+  cursor:grab;position:relative;
+  transition:transform .12s, box-shadow .12s, opacity .2s;
+}
+.note:nth-child(3n+1){transform:rotate(-.5deg)}
+.note:nth-child(3n+2){transform:rotate(.55deg)}
+.note:nth-child(3n){transform:rotate(-.2deg)}
+.note:hover{transform:rotate(0) scale(1.015);box-shadow:0 6px 14px rgba(35,40,51,.24);z-index:3}
+.note:active{cursor:grabbing}
+.note.hidden{display:none}
+.note.dragging{opacity:.45}
+.note p{font-size:13.3px;line-height:1.56;word-break:keep-all}
+.note .meta{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:11px;font-weight:700}
+.note .ts{font-weight:500;opacity:.55;color:var(--ink)}
+.note.A{background:var(--a-bg);border-top:5px solid var(--a-edge)} .note.A .src{color:var(--a-tag)}
+.note.B{background:var(--b-bg);border-top:5px solid var(--b-edge)} .note.B .src{color:var(--b-tag)}
+.note.C{background:var(--c-bg);border-top:5px solid var(--c-edge)} .note.C .src{color:var(--c-tag)}
+.note.D{background:var(--d-bg);border-top:5px solid var(--d-edge)} .note.D .src{color:var(--d-tag)}
+.note.E{background:var(--e-bg);border-top:5px solid var(--e-edge)} .note.E .src{color:var(--e-tag)}
+.note.F{background:var(--f-bg);border-top:5px solid var(--f-edge)} .note.F .src{color:var(--f-tag)}
+.note.G{background:var(--g-bg);border-top:5px solid var(--g-edge)} .note.G .src{color:var(--g-tag)}
+.note.H{background:var(--h-bg);border-top:5px solid var(--h-edge)} .note.H .src{color:var(--h-tag)}
+.note.I{background:var(--i-bg);border-top:5px solid var(--i-edge)} .note.I .src{color:var(--i-tag)}
+.note.J{background:var(--j-bg);border-top:5px solid var(--j-edge)} .note.J .src{color:var(--j-tag)}
+.note.K{background:var(--k-bg);border-top:5px solid var(--k-edge)} .note.K .src{color:var(--k-tag)}
+.note.L{background:var(--l-bg);border-top:5px solid var(--l-edge)} .note.L .src{color:var(--l-tag)}
+
+footer{max-width:1560px;margin:26px auto 0;font-size:12px;color:var(--ink-soft);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:720px){body{padding:18px 14px 60px}.wall{column-width:100%}h1{font-size:22px}}
+@media (prefers-reduced-motion:reduce){.note,.who{transition:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Qualitative Interview · Affinity Map · v3</div>
+  <h1>원장·강사 인터뷰 어피니티 맵 — 12인 누적 보드</h1>
+  <p class="sub">2차 심층 인터뷰 12건(원장 9 · 강사 3)의 핵심 발화를 포스트잇으로 옮기고 유사 의견을 테마별로 묶은 보드입니다.
+  인용문은 실제 표현에 최대한 가깝게 다듬었으며, 각 포스트잇의 타임스탬프로 원문 위치를 확인할 수 있습니다. 테마 메모는 결론이 아닌 가설 재료입니다.</p>
+
+  <div class="legend">
+    <div class="who" data-src="A">
+      <div class="chip" style="background:var(--a-bg);border-color:var(--a-edge)"></div>
+      <div><b>A · 솔뫼 원장 (종합 · 비접점)</b>
+      <span>21년차 · 초중고 전 과목 · 사립 인근 내신 특화 · 매쓰올릭스/족보닷컴/클래스카드</span></div>
+    </div>
+    <div class="who" data-src="B">
+      <div class="chip" style="background:var(--b-bg);border-color:var(--b-edge)"></div>
+      <div><b>B · 디에이블어학원 (보습 · 접점)</b>
+      <span>영어 약 20년차 · 김포 · 단어+서술형 집중 · 이퓨처 디스커버리/토킹스타/플라토</span></div>
+    </div>
+    <div class="who" data-src="C">
+      <div class="chip" style="background:var(--c-bg);border-color:var(--c-edge)"></div>
+      <div><b>C · 더그로우 (보습 초중등 · 접점)</b>
+      <span>6년차 · 송도 · 원아워/클래스카드/레디 · 바이브코딩으로 자체 관리툴·리포트 제작</span></div>
+    </div>
+    <div class="who" data-src="D">
+      <div class="chip" style="background:var(--d-bg);border-color:var(--d-edge)"></div>
+      <div><b>D · LTS어학원 (어학원 · 접점)</b>
+      <span>11년차 · 전직 교사 · 초중등 · 이퓨처 교재 · 매일 일지+수시 상담 · 넬트/클래스카드</span></div>
+    </div>
+    <div class="who" data-src="E">
+      <div class="chip" style="background:var(--e-bg);border-color:var(--e-edge)"></div>
+      <div><b>E · JK영어수학학원 (보습 · 접점)</b>
+      <span>7년차 · 평택 신도시 · 부부 운영 · 100% 서술형 자체 월말평가 · GPT/Gemini 제작교재</span></div>
+    </div>
+    <div class="who" data-src="F">
+      <div class="chip" style="background:var(--f-bg);border-color:var(--f-edge)"></div>
+      <div><b>F · 해냄학원 (보습 · 접점)</b>
+      <span>17년차 · 인천 · 초중고 200평 · 표지·제본 직접 제작 · 클래스카드 데이터 원장 입력</span></div>
+    </div>
+    <div class="who" data-src="G">
+      <div class="chip" style="background:var(--g-bg);border-color:var(--g-edge)"></div>
+      <div><b>G · 에이플러스스카이에듀 (보습 · 접점)</b>
+      <span>22년차 · 통역사 출신 · FC본사 사업부 경력 · 도구 최소주의 · 리딩게이트/토셀</span></div>
+    </div>
+    <div class="who" data-src="H">
+      <div class="chip" style="background:var(--h-bg);border-color:var(--h-edge)"></div>
+      <div><b>H · 토피아어학원 서초 (어학원 · 접점)</b>
+      <span>FC 지점 월급원장 3년차(업계 20년+) · 영영 단어시험 매주 제작 · AR도서 포인트제</span></div>
+    </div>
+    <div class="who" data-src="I">
+      <div class="chip" style="background:var(--i-bg);border-color:var(--i-edge)"></div>
+      <div><b>I · 전소영 강사 (보습 · 비접점)</b>
+      <span>파닉스 FC+내신 보습 4~5년 · 현 온라인 과외 · AI 첨삭 프롬프트 적극 활용</span></div>
+    </div>
+    <div class="who" data-src="J">
+      <div class="chip" style="background:var(--j-bg);border-color:var(--j-edge)"></div>
+      <div><b>J · 김소이 강사 (솔뫼 · 비접점)</b>
+      <span>10년차 · 목동 대형 영어전문→종합학원 · GPT 독해 변형 · 능률 문제링크 구독</span></div>
+    </div>
+    <div class="who" data-src="K">
+      <div class="chip" style="background:var(--k-bg);border-color:var(--k-edge)"></div>
+      <div><b>K · 세움영어수학학원 (보습 · 비접점)</b>
+      <span>학원 8년차(과외 등 합산 약 30년) · 8명 정원 소수정예 · 1년 선행+심화 · 상담 100% 원장 직접</span></div>
+    </div>
+    <div class="who" data-src="L">
+      <div class="chip" style="background:var(--l-bg);border-color:var(--l-edge)"></div>
+      <div><b>L · 뛰는 수학 나는 영어 (보습 · 접점)</b>
+      <span>8년차 강사 · 영유~성인 전 레벨 · 대형 어학원 프랜차이즈 운영 경험 · 이동하는 학원마다 커리큘럼 재설계</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span class="hint">인터뷰이 카드를 <kbd>클릭</kbd>하면 해당 인터뷰이만 볼 수 있고, 포스트잇을 <kbd>드래그</kbd>해 다른 테마로 옮겨 다시 묶을 수 있습니다.</span>
+  <button class="reset" onclick="resetFilter()">필터 해제</button>
+</div>
+
+<main class="wall" id="wall">
+  <section class="theme" data-theme="t1">
+    <div class="t-head">
+      <div class="t-title">① 자료 제작, 사람을 갈아 넣는 노동 <span class="cnt"></span></div>
+      <div class="t-note">11인 중 강사 포함 전원이 자료 제작·출력·제본·채점에 상시적 시간을 쓰고 있음. 규모와 무관하게 반복</div>
+    </div>
+    <div class="notes">
+      <div class="note A" draggable="true"><p>3시간 수업 한 회차 자료 만드는 데 네다섯 시간. 열 타임짜리 교재면 한 50시간 걸리는 거죠.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">30:05</span></div></div>
+      <div class="note A" draggable="true"><p>수능특강·수능완성 합치면 긴 지문이 3~400개. 두 달 안에 만들어야 해서 2월부터 4월까지 잠을 못 자요. 매년 5월엔 몸이 아파요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">42:29</span></div></div>
+      <div class="note D" draggable="true"><p>발음 체크나 워크시트·부가 자료 만드는 데 일주일에 10시간 이상은 쓰는 것 같아요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">03:32</span></div></div>
+      <div class="note D" draggable="true"><p>잘하는 아이는 교재를 더 쓰고, 못하는 아이는 수준에 맞는 보충 교재를 복사해서 다시 줘요. 그게 좀 힘들어요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">07:39</span></div></div>
+      <div class="note E" draggable="true"><p>학부모 상담이 하루 한두 시간, 제작 교재 인쇄·제본이 하루 2~3시간. 제본도 제가 직접 해요.</p><div class="meta"><span class="src">E JK</span><span class="ts">06:17</span></div></div>
+      <div class="note E" draggable="true"><p>초등부 자료가 더 손이 가요. 이미지 찾아 붙이고, 한 단원에 30~40분. 중고등은 프롬프트 넣으면 10분이면 돼요.</p><div class="meta"><span class="src">E JK</span><span class="ts">16:04</span></div></div>
+      <div class="note F" draggable="true"><p>프린트에 표지 만들고 스프링 제본까지 다 해요. 학교에서 풀어도 표지가 있어 보여야 하니까. 표지 이미지만 던져 주면 색만 바꿔 쓸 텐데요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">08:58</span></div></div>
+      <div class="note F" draggable="true"><p>클래스카드 데이터는 제가 다 넣어요. 선생님들이 안 넣어요. 그 세팅 과정이 시간을 잡아먹죠.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">46:42</span></div></div>
+      <div class="note H" draggable="true"><p>매주 영영 단어 시험지를 만들어요. 중등은 매주 100개. 엑셀에 수작업으로 넣고 랜덤으로 돌려서 내죠.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">10:12</span></div></div>
+      <div class="note H" draggable="true"><p>자료 제작에 선생님들이 하루 2시간, 저랑 알바가 2~3시간. 내신 전 2주는 주말까지 나와요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">30:30</span></div></div>
+      <div class="note I" draggable="true"><p>재시험이 은근 손이 가요. 수업 중에 2~3분 짬을 내서 문제 순서 바꾸고 20개를 새로 골라야 하니까요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">08:04</span></div></div>
+      <div class="note J" draggable="true"><p>티는 안 나는데 성장 리포팅이 시간을 잡아요. 폼을 만들어놔도 숙제·코멘트가 애들마다 다르니까. 영어는 해석이 다 달라서 채점도 수기예요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">03:52</span></div></div>
+      <div class="note C" draggable="true"><p>출력이 은근히 시간을 제일 잡아먹어요. 걸리면 뜯어내고. 기본 2시간이고, 만드는 작업은 다 집에서 해요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">11:31</span></div></div>
+      <div class="note B" draggable="true"><p>결국 조교 쌤한테 "이거 이거 만들어 주세요" 하거나, 요즘은 AI가 잘 돼 있으니 긁어서 만들어요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">08:12</span></div></div>
+      <div class="note L" draggable="true"><p>워크시트가 좀 더 있었으면 좋겠어요. 저는 추가적으로 더 만들 여력이 없어서 회사에서 제공해 주는 자료를 최대한 활용하는 쪽으로 하고 있어요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">23:10</span></div></div>
+      <div class="note L" draggable="true"><p>학교마다 시험 범위가 다 달라서 그룹으로 나눠 준비해야 해요. 저는 경력이 있어서 30분 정도면 되는데, 그 시간도 줄면 훨씬 좋죠.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">05:41</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t2">
+    <div class="t-head">
+      <div class="t-title">② 2022 개정 = 기출 공백, 지금이 진입 창 <span class="cnt"></span></div>
+      <div class="t-note">교과서 전면 개정으로 기출·족보가 리셋된 상태. "콘텐츠가 없다"는 호소가 어학원·보습·강사에서 동시 발생</div>
+    </div>
+    <div class="notes">
+      <div class="note H" draggable="true"><p>교과서가 개정되면서 기출이 전혀 없어요. 3주 내신 기간인데 2주면 문제가 떨어진다고 컴플레인이 와요. 학교 핸드아웃 걷어서 타이핑하고 문제를 만들죠.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">11:51</span></div></div>
+      <div class="note H" draggable="true"><p>결론은 콘텐츠가 없다는 거예요. 독해든 그래머든 문제가 없는 게 지금의 문제점이죠.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">13:19</span></div></div>
+      <div class="note J" draggable="true"><p>기출이 없어서 시험 범위 후보 1~4과를 전부 미리 만들어 제본해 놓고 때려 맞춰요. 학교 선생님 성향은 애들한테 계속 물어봐서 파악하고요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">26:35</span></div></div>
+      <div class="note G" draggable="true"><p>교과서가 최근 싹 개정돼서 관련 자료가 시중에 나오기까지 시간이 걸려요. 못 기다리고 미리 준비하는 경우가 꽤 있죠. 교과서 하나·한 학년에 2~3시간씩이에요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">20:00</span></div></div>
+      <div class="note E" draggable="true"><p>올해 중2부터는 배정 교과서가 달라서 기출로 돌릴 수가 없어요. 학교별 출제 스타일을 분석해서 문제를 새로 만들고 있어요.</p><div class="meta"><span class="src">E JK</span><span class="ts">12:15</span></div></div>
+      <div class="note A" draggable="true"><p>교과서는 7년 주기로 바뀌어요. 자료를 다 만들어서 좀 쓸 만하다 싶으면 다음 교육과정 제작이 발표돼요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">34:23</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t3">
+    <div class="t-head">
+      <div class="t-title">③ 기존 툴의 벽 — 커스터마이징·연동 부재 <span class="cnt"></span></div>
+      <div class="t-note">툴을 버리는 이유는 기능 부족이 아니라 "우리 학원 방식·범위대로 안 됨"과 "여러 앱에 흩어짐"</div>
+    </div>
+    <div class="notes">
+      <div class="note B" draggable="true"><p>결국에는 그 틀 안에서 만들어야 돼요. 절대 커스터마이징이 안 되니까, 저는 그냥 프로그램 싹 다 깼어요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">08:03</span></div></div>
+      <div class="note B" draggable="true"><p>since 접속사 문제만 뽑고 싶은데, 접속사가 다 섞인 문제만 있지 since 문제는 없어요. 세부적으로 만들 수 있는 게 없어요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">07:29</span></div></div>
+      <div class="note E" draggable="true"><p>넬트는 좋은 프로그램인데 우리 학원에서 배운 범위에서 출제되는 게 아니라 의미가 없어요. 클래스카드는 학교에서 너무 많이 써서 차별성이 없고요.</p><div class="meta"><span class="src">E JK</span><span class="ts">33:13</span></div></div>
+      <div class="note E" draggable="true"><p>원더스는 PPT에 암호가 걸려 있고 이북도 무겁고, 총판 통해 서너 번 인증까지 해야 했어요. 접근성 때문에 이퓨처로 다 갈아탔어요.</p><div class="meta"><span class="src">E JK</span><span class="ts">37:28</span></div></div>
+      <div class="note G" draggable="true"><p>앱이 여러 개면 리스닝 따로, 스피킹 따로 접속해야 하니 필수적인 한두 개 빼고는 안 써요. 우리 홈페이지에 연동되는 프로그램이 많지 않잖아요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">29:55</span></div></div>
+      <div class="note D" draggable="true"><p>도구를 고를 땐 아이들이 접근하기 편한지, 그리고 아이 취약점을 얼마나 잘 파악해 주는지를 봐요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">18:33</span></div></div>
+      <div class="note J" draggable="true"><p>온라인 판서 툴은 동그라미 하나 치려면 찾아서 눌러야 하고 번거로워요. 손으로 하면 직관적인데. 툴이 쉬워야 해요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">36:03</span></div></div>
+      <div class="note B" draggable="true"><p>클래스카드를 써도 결국 저희가 긁어서 넣어야 돼요. 학원만의 색깔을 넣으려면 결국 저희 손이 닿아야 되더라고요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">01:55</span></div></div>
+      <div class="note A" draggable="true"><p>이 학교에서 출제하려는 선생님 성향이랑 맞지 않으면 의미가 없어요. AI한테 일일이 학습시킬 바에 그냥 제 손으로 만들죠.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">15:49</span></div></div>
+      <div class="note A" draggable="true"><p>사립학교는 매년 자료가 달라져요. 데이터를 학습시켜 놔도 내년에 쓸 수 있다는 보장이 없어요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">16:13</span></div></div>
+      <div class="note B" draggable="true"><p>좋은 틀만 받아서 저희가 변형해 넣을 수 있으면, 커스터마이징이 되면 너무 좋은데 보통은 주는 대로 써야죠.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">03:01</span></div></div>
+      <div class="note L" draggable="true"><p>이퓨처 이북은 파트마다 음원 버튼이 바로 있어서 눌러서 재생되는데, 능률 이북은 그게 없어서 음원 파일을 따로 찾아 다시 틀어줘야 해요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">28:46</span></div></div>
+      <div class="note L" draggable="true"><p>클래스카드가 교재랑 연동이 워낙 잘 돼 있어서 그거 위주로 쓰게 돼요. 다른 회사 책도 있는데 결국 편한 걸 쓰게 되더라고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">35:48</span></div></div>
+      <div class="note C" draggable="true"><p>저는 한 가지에서 다 끝내는 게 우선순위예요. 여러 개 있으면 애들이 로그인을 또 해야 하니까요. 원아워는 그냥 플랫폼이라, 이퓨처를 쓰다가 능률을 쓸 수도 있고 그걸 하나의 통합 플랫폼 안에서 쓸 수 있어서 정착하게 됐어요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">27:57</span></div></div>
+      <div class="note C" draggable="true"><p>클래스카드를 쓰는 이유 중 하나가 문법이에요. 근데 그건 생성형이 아니라 있는 걸 그대로 쓰는 거예요. 원아워한테 문법 생성형을 만들어달라고 했더니, 클래스카드가 이미 잘하는 부분이라 따라갈 필요는 없다고, 대신 생성형 쪽으로 가겠다고 하셨어요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">28:52</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t4">
+    <div class="t-head">
+      <div class="t-title">④ AI 활용의 온도차 (회의 ~ 자체 개발) <span class="cnt"></span></div>
+      <div class="t-note">"어떻게 쓰는지 모르겠다"(H·K)부터 유료 구독 프롬프트 장인(E·I·J), 자체 개발(C)까지 스펙트럼이 매우 넓음</div>
+    </div>
+    <div class="notes">
+      <div class="note H" draggable="true"><p>AI는 솔직히 거의 사용 안 해요. 어떻게 쓰는지 잘 모르겠어요. 저희가 만드는 폼과 노하우가 있어서 제 손에 맞는 게 편하더라고요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">43:56</span></div></div>
+      <div class="note K" draggable="true"><p>AI로 만들어 달라고 아들한테 부탁해 봤는데 오타도 많고 맥락이 안 맞는 부분이 많더라고요. 아직은 사람이 낫다, 하고 의존하지 않아요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">33:40</span></div></div>
+      <div class="note E" draggable="true"><p>학교별 출제 스타일을 AI한테 넣고 "이런 스타일로 문제를 내 줘"라고 해요. GPT·Gemini를 유료 구독하면서 프롬프트를 직접 만드는 게 더 편해요.</p><div class="meta"><span class="src">E JK</span><span class="ts">19:08</span></div></div>
+      <div class="note E" draggable="true"><p>시중 문제 생성 프로그램도 써 봤는데 퀄리티에 부족함을 느꼈어요. "굳이 이런 문제를 내야 되나" 싶은 문제들이요.</p><div class="meta"><span class="src">E JK</span><span class="ts">18:44</span></div></div>
+      <div class="note F" draggable="true"><p>족보닷컴 AI 문제 생성은 70%만 만족스러워요. 쓰레기 문제도 좀 있어요. 난이도가 안 맞거나 교과 외 지문을 못 녹이거나.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">29:46</span></div></div>
+      <div class="note I" draggable="true"><p>라이팅 첨삭을 여섯 항목(내용·구조·담화·문법·어휘·맞춤법) 프레임으로 나눠 달라고 프롬프트를 주면 꽤 잘 나와요. 대신 굳이 안 고쳐도 될 것까지 고치긴 해요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">31:34</span></div></div>
+      <div class="note I" draggable="true"><p>"중2 수준 어휘로 예문 5개씩" 프롬프트를 주면 잘 나와요. 화면 공유해서 같이 읽으면 확실히 잘 받아들이고요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">16:38</span></div></div>
+      <div class="note J" draggable="true"><p>독해는 GPT로 지문을 변형해 고난도로 만들어 써요. 근데 문법은 프롬프트 자체가 어렵고 AI도 틀려서, 교차 검증하다 보면 검증된 자료를 사는 게 빨라요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">07:18</span></div></div>
+      <div class="note A" draggable="true"><p>(문제 출제에 AI) 아직은 안 돼요. GPT 돌려봐야 결과가 만족스럽지 않고, 다 편집해야 되고, 데이터도 저장이 안 되니까.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">15:13</span></div></div>
+      <div class="note A" draggable="true"><p>내신 신경 쓸 필요 없는 방학 특강 교재 만들 땐 AI가 훨씬 효과적이에요. 난이도 조절도 되고, 구문·어휘 지정도 되고.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">24:57</span></div></div>
+      <div class="note B" draggable="true"><p>시중에 없는 지문은 긁어서 AI에 넣어요. "중위 수준으로 문제 만들어 줘, 단어 정리해 줘" 이런 식으로 많이 써요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">09:31</span></div></div>
+      <div class="note C" draggable="true"><p>제 워크북 루틴(단어→브레인스토밍→컴프리헨션→라이팅)을 바이브코딩에 넣어서 제작 프로그램으로 만들었어요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">13:18</span></div></div>
+      <div class="note C" draggable="true"><p>학원 관리 프로그램도 제가 개발자분이랑 만들었어요. 진도·멘트 기록하고 알림톡까지 자동으로 나가요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">31:43</span></div></div>
+      <div class="note A" draggable="true"><p>챗GPT나 Gemini는 남들이 많이 찾은 정보를 우선 추천하니까, 아이들 수행 내용이 다 똑같아져요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">18:22</span></div></div>
+      <div class="note L" draggable="true"><p>나이 있으신 원장님들이나 보수적인 분들은 AI 활용을 잘 못 하세요. 근데 저희처럼 젊은 세대는 AI 활용하는 걸 더 좋아해요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">08:16</span></div></div>
+      <div class="note L" draggable="true"><p>Gemini나 GPT나 알려주는 게 다 비슷비슷해요. 맨날 비슷한 걸 물어보니까 비슷한 답만 나와서, 짜증나서 거기다 제 아이디어를 더 섞어요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">06:28</span></div></div>
+      <div class="note L" draggable="true"><p>예전엔 AI로 시험 문제도 만들었는데, 요즘은 문제 생성은 잘 안 하고 독해·요약하는 용도 위주로만 써요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">07:04</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t5">
+    <div class="t-head">
+      <div class="t-title">⑤ "이거 만들어 주면 쓴다" — 기능 니즈 <span class="cnt"></span></div>
+      <div class="t-note">지문 투입형 자료 생성, 약점×시험범위 맞춤 문제, 숙제 검사·채점 자동화, "영어판 매쓰홀릭"이 직접 요청됨</div>
+    </div>
+    <div class="notes">
+      <div class="note A" draggable="true"><p>학교 부교재나 처음 보는 지문을 넣으면 구문·어휘를 싹 정리해 주고, 그 자료로 아이들 평가까지 해 주면 — 영어 선생님들 환장하실 거예요. 지금까지 어디에도 그게 없어요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">31:47</span></div></div>
+      <div class="note I" draggable="true"><p>얘가 수동태를 모르면 내신 시험 범위 지문에 기반해서 수동태 문제를 만들어 주는 것. 시험 범위와 모르는 부분을 접목한 맞춤 문제요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">29:15</span></div></div>
+      <div class="note J" draggable="true"><p>수학은 매쓰홀릭이 어떤 문제가 취약하고 무슨 연습을 하면 좋은지 자동으로 적어 준대요. 영어는 그게 없거든요. 영어판이 있으면 너무 좋을 것 같아요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">31:14</span></div></div>
+      <div class="note J" draggable="true"><p>숙제 검사랑 채점을 AI가 해 주면 진짜 많이 단축될 것 같아요. 해석이 달라도 흡수해서 채점해 주면요. 티칭은 무조건 제가 하는 거고요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">29:00</span></div></div>
+      <div class="note D" draggable="true"><p>오늘 공부한 내용이 어머님한테 문자나 카톡으로 전송되고, 한 달에 한 번이라도 리포트가 자동 전송되면 좋겠어요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">11:43</span></div></div>
+      <div class="note D" draggable="true"><p>간단한 레벨테스트 말고, 한 달이든 석 달이든 정기적으로 볼 수 있는 테스트요. 우리 아이 실력이 어느 정도인지 궁금해하시는 어머님이 많아요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">13:35</span></div></div>
+      <div class="note F" draggable="true"><p>이퓨처 온라인은 5분이라 너무 짧아요. 15~20분만 되면 파닉스 이후 라인으로 전부 갈아탈 의향이 있어요. 우리 영어 애들만 85명이에요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">71:04</span></div></div>
+      <div class="note G" draggable="true"><p>독해 지문과 연동된 배경지식 콘텐츠가 교재에 내재화돼 있으면 좋겠어요. 수업 시작할 때 워밍업 자료로요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">31:41</span></div></div>
+      <div class="note G" draggable="true"><p>보편성보다 일관성이에요. 중간에 엎어 버리면 완성도가 쌓이지 않아요. 심플하지만 버그 없이 돌아가는 게 제일 중요해요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">40:54</span></div></div>
+      <div class="note B" draggable="true"><p>서술형 프로그램이 좀 나왔으면 좋겠어요. 같은 유형을 반복·변형해서 만드는 쌍둥이 문제요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">20:30</span></div></div>
+      <div class="note B" draggable="true"><p>발음 듣고 쓰는 단어 시험, 대표 단어만 말고 파생어·문장까지, 시험 기간엔 시험 범위 지문 어휘로 — 섞어 낼 수 있는 프로그램이 있으면.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">12:16</span></div></div>
+      <div class="note B" draggable="true"><p>수준별로 넣어 주면 얘가 이 파트를 통과해야 넘어가게. 선생님은 클릭만 하면 얘가 퀴즈 풀고 오답까지 쓰게.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">24:39</span></div></div>
+      <div class="note B" draggable="true"><p>초등이랑 중등은 방을 아예 분리해 주세요. 중등 애들은 초등이랑 섞여 있으면 유치하다고 안 해요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">52:40</span></div></div>
+      <div class="note C" draggable="true"><p>아이가 스스로 로그인해서 학습하면 그게 선생님 시스템에 자동으로 입력됐으면 좋겠어요. 지금은 채점하고 수기로 입력하거든요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">50:48</span></div></div>
+      <div class="note A" draggable="true"><p>프로그램을 만들어 주신다고 하면 저희한테 먼저 말씀해 주십시오.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">41:10</span></div></div>
+      <div class="note L" draggable="true"><p>내신이 요즘엔 교과서에만 안 나오고, 선생님이 신문이나 논문에서 지문을 따오기도 하잖아요. 그럴 땐 AI한테 "너 같으면 이 지문에 어떤 문제를 낼 것 같아?"라고 직접 물어보면서 활용했어요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">07:07</span></div></div>
+      <div class="note L" draggable="true"><p>종이로 돼 있는 책 한 권 안의 문제들을 그대로 온라인상에서 풀 수 있게끔 만들어 주면 좋겠어요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">32:11</span></div></div>
+      <div class="note L" draggable="true"><p>브랜드 교재들이 레벨이 올라갈수록 패턴이 다 똑같잖아요. 그러다 보니까 애들도 질리고 학부모도 질리더라고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">48:06</span></div></div>
+      <div class="note E" draggable="true"><p>문제 출제는 제가 하는 대로, 제 입맛에 맞게 계속하고 싶어요. 근데 스피킹은 제가 케어하는 데 한계가 있으니까 AI 튜터한테 맡기고 싶고요.</p><div class="meta"><span class="src">E JK</span><span class="ts">53:16</span></div></div>
+      <div class="note B" draggable="true"><p>저는 녹화하는 기능이 있었으면 좋겠어요. 지금 쓰는 토킹에서 제일 좋아하는 기능이 그거였거든요. 학습 완료된 영상을 받아서, 얘가 어디서 막히는지 뒤에서 볼 수 있게.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">42:52</span></div></div>
+      <div class="note B" draggable="true"><p>암기해야 하는 개념들은 초등 버전 누적도 있으면 좋겠고, 중등 버전으로도 있으면 좋겠어요. 명사가 오는 자리는 세트로 묶어서 갈 수 있게 나열해주는 것도 필요할 것 같아요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">42:22</span></div></div>
+      <div class="note C" draggable="true"><p>제가 만든 리포트 프로그램도 눌러야 되는 게 많아요. 사용자 편의성 때문에 저조차도 자꾸 손이 안 가는 거예요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">36:11</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t6">
+    <div class="t-head">
+      <div class="t-title">⑥ 리포트 — 자동 생성의 꿈과 반론 <span class="cnt"></span></div>
+      <div class="t-note">"클릭·키워드만 넣으면 문구가 생성"이 다수의 꿈. 단 G는 "화려한 그래프보다 선생님의 전달이 본질"이라는 반론</div>
+    </div>
+    <div class="notes">
+      <div class="note F" draggable="true"><p>서일영어는 클릭하면 성적 상황은 나오는데 마지막 멘트는 강사가 다 타이핑해야 돼요. 클릭한 내용이 자동으로 자연스럽게 생성되면 좋겠다는 게 제 생각이에요. AI 시대니까.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">63:24</span></div></div>
+      <div class="note F" draggable="true"><p>교재가 끝났을 때 아이 수준을 딱딱 넣으면 적당한 문구가 생성되고, 아이 이름까지 들어간 총평이 나오는 것. 그게 제 큰 욕심이에요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">61:14</span></div></div>
+      <div class="note H" draggable="true"><p>선생님마다 코멘트 편차가 너무 커요. 성의 없이 두 줄 쓰는 분도 있고. 기본 키워드만 입력하면 아름다운 문구가 생성되는 것, 그게 제가 꿈꾸는 바예요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">53:02</span></div></div>
+      <div class="note E" draggable="true"><p>성적표 폼을 만든 지 몇 년 돼서 구식이에요. 개편해서 좀 더 있어 보이고 싶어요. 그래프라든지, 외적인 부분이요.</p><div class="meta"><span class="src">E JK</span><span class="ts">23:01</span></div></div>
+      <div class="note D" draggable="true"><p>제일 눈으로 시각화되는 것, 그래프로 영역별로요. AI는 AI 선에서 총평을 하고 디테일한 부분은 선생님 터치가 들어가는 게 좋아요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">28:01</span></div></div>
+      <div class="note G" draggable="true"><p>화려한 그래프가 나와도 "우리 아이 얘기가 아닌 것 같다"는 느낌이 들어요. 결국 선생님이 그 자료로 아이의 상태와 방향을 어떻게 전달하느냐가 중요하죠.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">35:33</span></div></div>
+      <div class="note G" draggable="true"><p>리포트가 있으면 편해질 거라 생각하시지만 저는 그건 별개라고 봐요. 아이가 조는 시간이 많아졌을 때 생활 패턴을 물어봐 주는 걸 부모는 고마워해요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">36:20</span></div></div>
+      <div class="note K" draggable="true"><p>영어는 월 리포트에 3개월마다 성적표까지 나가요. 제가 직접 안 가르치니까 안전장치를 하나 더 둔 거죠.</p><div class="meta"><span class="src">K 세움</span><span class="ts">31:28</span></div></div>
+      <div class="note A" draggable="true"><p>학원 관리 시스템에는 학습 데이터가 안 쌓여요. (리포트 니즈가 있냐고요?) 너무, 굉장히요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">37:45</span></div></div>
+      <div class="note A" draggable="true"><p>수학 매쓰올릭스는 소름 끼치게 잘 맞아요. 저희가 캐치 못 한 것도 잡아 줘요. 근데 영어엔 우리나라 학생에 포커스한 그런 프로그램이 없죠.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">38:09</span></div></div>
+      <div class="note B" draggable="true"><p>시험 결과 데이터를 보내 드리면 전화가 안 와요. "아, 그렇네요" 하고 끝나요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">27:50</span></div></div>
+      <div class="note B" draggable="true"><p>학부모는 그래프로 딱딱딱, 가시성 있게 안 써 주면 안 보세요. 상위 몇 %인지만 보시고, 어느 파트가 부족한지는 안 보세요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">28:46</span></div></div>
+      <div class="note C" draggable="true"><p>'성장 리포트'를 직접 만들고 있어요. 누적 단어 수, 원서 권수, 과제율을 6개월 단위로 보여 주려고요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">32:38</span></div></div>
+      <div class="note C" draggable="true"><p>1년 전엔 알파벳 했는데 지금 라이팅 하는 걸 보여 드리고 싶어요. 어머님은 "이만큼 다녔으면 더 잘해야 하는 거 아니냐"고 하시거든요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">34:51</span></div></div>
+      <div class="note C" draggable="true"><p>제가 만든 리포트도 클릭할 게 많으니 제 손이 안 가요. 사용자 편의성이 안 되면 저도 안 쓰게 되더라고요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">36:11</span></div></div>
+      <div class="note L" draggable="true"><p>학원에는 데이터가 굉장히 많은데, 다 종이로 되어 있거나 선생님이 갖고 있는 거라 선생님 역량에 100% 의존하고 있는 상태예요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">48:38</span></div></div>
+      <div class="note L" draggable="true"><p>약점분석·강점분석이 담긴 리포트가 나오면, 그걸로 학부모 설득 자료나 앞으로의 솔루션 제안에 쓸 수 있죠. 좋죠, 그런 거.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">49:36</span></div></div>
+      <div class="note L" draggable="true"><p>원장님들도 어머님들 상담할 때 그런 객관적인 데이터를 보여주고 싶어 하는데, 없는 거예요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">52:13</span></div></div>
+      <div class="note L" draggable="true"><p>엄마들은 그런 걸 보고 싶어 하는데 그냥 말로만 설명을 들으니까, 갈증이 있으신 거예요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">52:28</span></div></div>
+      <div class="note E" draggable="true"><p>레벨테스트나 리포트 같은 경우는 버겁다기보다, 그 시간에 다른 걸 하고 싶어요. 자동으로 발송해주면 너무 좋겠죠.</p><div class="meta"><span class="src">E JK</span><span class="ts">52:41</span></div></div>
+      <div class="note F" draggable="true"><p>온라인 평가가 AI로 만들어지는데 기계적인 게 아니라 자연스럽게 녹아나서, 그걸 분석해서 아예 총평까지 나오면 좋겠어요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">01:01:58</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t7">
+    <div class="t-head">
+      <div class="t-title">⑦ 레벨테스트 — 불신, 그러나 필요 <span class="cnt"></span></div>
+      <div class="t-note">"정해진 시험지" 불신은 공통. 대안으로 적응형·영역별 진단·또래 대비 위치·오답률 분석이 언급됨</div>
+    </div>
+    <div class="notes">
+      <div class="note H" draggable="true"><p>입학 테스트를 봐도 리포트 카드가 안 나와요. 돈 내고 보는데 내 아이가 어느 영역이 약한지 진단을 못 주는 게 아쉽죠. 폴리 있을 땐 바로 출력해서 보여줬거든요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">45:30</span></div></div>
+      <div class="note H" draggable="true"><p>같은 학년 재학생 평균 대비 내 아이가 어느 정도인지까지 나오면 좋겠어요. 온라인 시험이면 실시간으로 데이터가 쌓이고 강약점 분석이 되겠죠. 그런 쪽이 AI 아닐까요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">49:14</span></div></div>
+      <div class="note G" draggable="true"><p>중등은 커리큘럼 레벨별 문항을 섞어 내서 어디서부터 오답률이 증가하는지 분석해요. 그러면 아이가 우리 레벨 어디에 맞는지 더 정확해요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">34:00</span></div></div>
+      <div class="note D" draggable="true"><p>지금 이퓨처 레벨테스트는 아이 실력보다 조금 높게 나와요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">26:50</span></div></div>
+      <div class="note A" draggable="true"><p>정해진 시험지로 보는 레벨테스트는 거의 의미가 없어요. 그 문항 수로는 아이 능력을 평가하기에 턱없이 부족해요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">50:34</span></div></div>
+      <div class="note A" draggable="true"><p>심리테스트처럼 답에 따라 다음 문항이 바뀌는 능동형 프로그램이면 아이 능력을 정확하게 파악할 수 있을 것 같아요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">51:05</span></div></div>
+      <div class="note B" draggable="true"><p>레벨테스트의 공신력이 저는 좀 무너졌어요. 대신 태도, 하루에 얼마나 배울 수 있는지, 엉덩이 힘을 봐요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">48:32</span></div></div>
+      <div class="note B" draggable="true"><p>그래도 처음엔 온라인 레벨테스트가 필요해요. 듣기·말하기까지 영역별로 4개가 있어야 하고요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">49:57</span></div></div>
+      <div class="note C" draggable="true"><p>넬트는 너무 오래 걸려서 상·하반기 종합평가용으로만 써요. 입회 땐 출판사 무료 테스트 — 리포트가 잘 나와서요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">49:20</span></div></div>
+      <div class="note A" draggable="true"><p>자기 객관화가 안 되면 공부를 할 수가 없어요. 테스트가 안 되니까 선행으로 달리고, 시간 낭비 돈 낭비가 돼요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">52:17</span></div></div>
+      <div class="note L" draggable="true"><p>타 학원에서 레벨테스트를 보면 아이 실력보다 훨씬 낮게 나와요. 엄마들은 그게 처음이니까 그대로 믿고 큰일 났다며 학원을 옮기시더라고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">41:57</span></div></div>
+      <div class="note L" draggable="true"><p>플레이스먼트 테스트를 저도 활용하고 싶었는데, 소형 학원은 반이 다양하지 않아서 굳이 필요가 없어요. 대형 학원은 자체 테스트가 있고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">42:30</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t8">
+    <div class="t-head">
+      <div class="t-title">⑧ 스피킹의 공백 — 원어민의 빈자리 <span class="cnt"></span></div>
+      <div class="t-note">원어민 고용 축소·불법(입시학원) 상황에서 체계적 스피킹 툴 부재가 반복 언급. 내신 체제와의 괴리도 공통</div>
+    </div>
+    <div class="notes">
+      <div class="note E" draggable="true"><p>AI 튜터로 스피킹을 강화하고 싶어요. 입시학원은 원어민 고용이 불법인데 학부모님들은 원어민을 요청하시거든요. 화상영어는 메리트가 없다고 봐요.</p><div class="meta"><span class="src">E JK</span><span class="ts">51:44</span></div></div>
+      <div class="note G" draggable="true"><p>말하기 온라인 프로그램을 몇 년째 찾고 있는데, 커리큘럼이 단계적으로 체계화돼 있고 학원이 과제 부여·레벨링을 할 수 있는 건 아직 없어요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">28:18</span></div></div>
+      <div class="note J" draggable="true"><p>멀리 보면 스피킹이 진짜 중요한데, 내신 성적을 받으려면 계속 암기밖에 없잖아요. 그 괴리가 있어요. 라이팅 시키면 대부분 I 하나 쓰고 기다리고 있고요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">22:37</span></div></div>
+      <div class="note D" draggable="true"><p>이퓨처엔 녹음 프로그램이 없잖아요. 아이들 발음 체크하는 것들이 시간이 많이 걸려요. 가장 필요한 것도 리포트, 그다음이 발음이에요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">02:59</span></div></div>
+      <div class="note K" draggable="true"><p>원서 수업에 AI 발음 같은 태블릿 수업을 해 보니, 레벨이 제각각인 아이들이 와도 커버되는 것. 그거 하나는 정말 반했어요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">39:13</span></div></div>
+      <div class="note L" draggable="true"><p>요즘에는 여러 학원에서 다들 녹음해서 숙제를 내는 경우가 많아요. 녹음해서 보내면 그다음 채점을 어떻게 하는지는 사실 학원마다 방식이 다 다르고 정리가 안 돼 있는 것 같아요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">37:48</span></div></div>
+      <div class="note B" draggable="true"><p>일기를 매번 녹음해서 보내라고 해요. 지문 끝나면 MP3 보내주고, 듣고 연습한 다음 다시 녹음해서 보내라고 시켜요. 이걸 저희 사이트에서 바로 할 수 있으면 좋을 텐데.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">15:04</span></div></div>
+      <div class="note C" draggable="true"><p>원아워를 쓰면 소리영어랑 원서를 할 수 있다는 게 큰 장점이에요. 아이들 발화량도 많이 늘고, 녹음하면 발음 점수가 바로 보여서 유창성이 많이 키워져요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">27:15</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t9">
+    <div class="t-head">
+      <div class="t-title">⑨ 온라인 학습의 현실 — 집·꼼수·검사 부담 <span class="cnt"></span></div>
+      <div class="t-note">"집에서는 게임으로 빠진다"가 다수. 완료 여부만 보이는 툴은 찍기 꼼수에 뚫림. 단 통과 기준이 명확하거나 관리가 강하면 굴러감</div>
+    </div>
+    <div class="notes">
+      <div class="note F" draggable="true"><p>집에서 하라고 하면 그대로 게임으로 빠져요. 틀어놓고 딴짓하고. 클래스카드는 테스트 통과가 명확하니까 하고요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">58:43</span></div></div>
+      <div class="note G" draggable="true"><p>앱 숙제는 하다 보면 게임으로 빠져요. 앱은 수업 시간에 활용하고, 숙제는 직접 내주는 걸 부모님도 선생님도 선호해요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">13:31</span></div></div>
+      <div class="note G" draggable="true"><p>아이들이 IT에 영악해요. 뒤로 가기 하면 정답이 보이고, 화면 두 개 켜놓고 하고. 온라인 프로그램 컴플레인의 제일 많은 부분이에요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">41:41</span></div></div>
+      <div class="note I" draggable="true"><p>클래스카드에서 답 나올 때까지 아무거나 누르는 애가 있어요. 학원에선 완료 여부만 보이지 몇 번 시도했는지는 안 나오니까요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">20:39</span></div></div>
+      <div class="note I" draggable="true"><p>영어 도서관은 L1 아이들용이라 한국 애들은 문맥 추측이 안 돼요. 단어를 누르면 뜻이 나오는 자동 주석 같은, 한국식 영어 도서관이 있으면 좋겠어요.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">25:01</span></div></div>
+      <div class="note J" draggable="true"><p>온라인 숙제는 할 친구들만 하고, 안 한 걸 한 척하는 게 보여요. 그걸 검사하는 과정이 수업 시간을 많이 잡아먹고, 역효과인 것 같아요.</p><div class="meta"><span class="src">J 김소이</span><span class="ts">18:40</span></div></div>
+      <div class="note D" draggable="true"><p>매일 온라인 진도를 체크하는데 아이들이 생각보다 잘해요. 안 지키면 혼나니까요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">25:32</span></div></div>
+      <div class="note L" draggable="true"><p>이스마트캠퍼스 활동이 1~2분이면 끝나서 짧아요. 15분 정도는 됐으면 하는데, 그건 결국 선생님 역량에 따라 갈리는 부분인 것 같아요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">24:39</span></div></div>
+      <div class="note L" draggable="true"><p>저학년은 타이핑이 안 돼서 스트레스를 받아요. 그래서 클릭이나 터치 위주로 하고, 고학년·중등부터 타이핑하면서 라이팅·스피킹으로 넘어가는 게 맞는 것 같아요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">32:15</span></div></div>
+      <div class="note L" draggable="true"><p>요즘 알파 세대 애들은 오히려 타이핑을 잘 안 해요. 세대가 바뀌면서 또 그런 게 있더라고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">33:36</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t10">
+    <div class="t-head">
+      <div class="t-title">⑩ 달라진 학생, 구하기 힘든 강사 <span class="cnt"></span></div>
+      <div class="t-note">"시켜서 보내야 하는 시대"와 강사의 시간·역량 한계, 원장 속인화 리스크가 프로그램 수요의 근본 배경</div>
+    </div>
+    <div class="notes">
+      <div class="note I" draggable="true"><p>반복되는 구멍이 보여도, 그 구멍에 맞는 과제를 만들려면 시급제 강사는 시간이 없어요. 솔직히 내 학원도 아닌데, 그 아이를 위해 자료를 만들어 주기가 힘든 거죠.</p><div class="meta"><span class="src">I 전소영</span><span class="ts">01:31</span></div></div>
+      <div class="note K" draggable="true"><p>제가 아파서 입원하면 다른 선생님이 대체할 수 없어요. 좋은 시스템은 아니죠. 내가 없어도 돌아갈 시스템을 만드는 게 고민인데, 쉽지 않더라고요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">25:09</span></div></div>
+      <div class="note K" draggable="true"><p>학부모 상담은 100% 제가 해요. 선생님들이 제일 힘들어하는 부분이라, 그 스트레스가 없으니 선생님들이 오래 계세요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">08:15</span></div></div>
+      <div class="note K" draggable="true"><p>옆 초등학교에 들어가 봤더니 작년보다 100명 넘게 줄었더라고요. 앞으로 5년은 초등 저학년 대상으로는 못 산다고들 해요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">06:37</span></div></div>
+      <div class="note H" draggable="true"><p>강사분들 중에 워드나 한글을 잘 못 다루는 분이 꽤 많아요. 오탈자에 폼도 안 맞고. 그래서 시험지 검수를 제가 다 해요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">09:13</span></div></div>
+      <div class="note H" draggable="true"><p>내신이 90점 아래로 나오면 바로 학원을 옮기세요. 결국 성과를 증명하는 게 전부죠.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">16:41</span></div></div>
+      <div class="note E" draggable="true"><p>그만두는 이유는 결국 하나예요. 공부가 어렵다는 것. 학습 자존감이라고들 하죠.</p><div class="meta"><span class="src">E JK</span><span class="ts">27:45</span></div></div>
+      <div class="note B" draggable="true"><p>옛날 애들은 선생님 믿고 했는데, 요즘 애들은 알겠다고 하고 안 해요. 어떻게든 강제로 시켜야 되는 시대가 왔어요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">24:02</span></div></div>
+      <div class="note B" draggable="true"><p>자기주도 되는 애들은 학원에 안 와요. 안 되는 애들이 오니까, 학부모도 "학원에서 시켜서 보내라"는 거예요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">47:26</span></div></div>
+      <div class="note B" draggable="true"><p>고등 강사 한 명 모셔서 퇴직금까지 줄 바에, 저는 그 돈을 여기(프로그램)에 쏟아붓겠다는 거예요. 그게 더 이득이에요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">37:04</span></div></div>
+      <div class="note C" draggable="true"><p>잘하는 강사는 결국 학원에 안 있고 나와서 1인 공부방을 차려요. 훨씬 적게 일하고 수입은 많아지니까요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">05:30</span></div></div>
+      <div class="note G" draggable="true"><p>지금은 메가 프랜차이즈 시대가 끝나고, 실력 있는 원장님이 직접 강의하는 30~200명 규모 강소 학원들이 대세예요.</p><div class="meta"><span class="src">G 에이플러스</span><span class="ts">02:06</span></div></div>
+      <div class="note A" draggable="true"><p>지금은 학원마다 자기 색깔이 분명해야 돼요. 색깔이 없으면 살아남기 어렵죠.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">04:49</span></div></div>
+      <div class="note L" draggable="true"><p>원장님들 얘기 들어보면 강사마다 편차가 커요. 그렇다고 강사 구하는 것도 쉽지 않고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">49:01</span></div></div>
+      <div class="note L" draggable="true"><p>제가 커리큘럼을 다시 짜드리면 원장님이 만족해서 그대로 진행하세요. 프랜차이즈 커리큘럼도 허리가 부실한 경우가 많아서, 옮기는 학원마다 제가 다시 짜요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">17:30</span></div></div>
+      <div class="note L" draggable="true"><p>제가 1년 정도 맡아서 커리큘럼을 바꾸니까 14명이던 학원이 30명 넘게 늘었어요. 결국 강사 역량에 달린 거죠.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">43:28</span></div></div>
+      <div class="note C" draggable="true"><p>이 프로그램, 제가 만든 거예요. 알림톡이랑 리포트까지 다 보낼 수 있게. 다른 원장님들도 필요하시면 쓰실 수 있게 열어드리고 있어요. 천원 내시면 만드실 수 있게 지금 오픈해드리고 있어요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">31:43</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t11">
+    <div class="t-head">
+      <div class="t-title">⑪ 자료 독점이 만든 대치동 쏠림 <span class="cnt"></span></div>
+      <div class="t-note">수능특강 자료 제작이 불가능한 지역 학원 → 대치동 공장식 제작 독점. A원장이 지목한 구조적 공백</div>
+    </div>
+    <div class="notes">
+      <div class="note A" draggable="true"><p>고3 수능특강 수업을 할 수 있는 학원이 없어요. 자료를 만들 수가 없거든요. 이 선생님들이 능력이 없어서 못 하는 게 아니에요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">41:50</span></div></div>
+      <div class="note A" draggable="true"><p>대치동은 강사 한 명이 조교 7~8명을 데리고 공장식으로 자료를 만들어요. 자료를 받으려면 거기 갈 수밖에 없는 거죠.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">44:25</span></div></div>
+      <div class="note A" draggable="true"><p>연봉 100억 강사 수익의 7~80%는 교재비예요. 얇은 책 한 권에 7~8만원, 교재비가 원비를 초과해 버려요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">45:07</span></div></div>
+      <div class="note A" draggable="true"><p>지방 애들은 방을 잡아 놓고 주말마다 올라와요. 수업 퀄리티는 큰 차이 없어요. 자료 여부 때문이에요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">47:00</span></div></div>
+      <div class="note A" draggable="true"><p>수능 지문의 반복 표현은 얼마든지 학습시킬 수 있을 거예요. 대치 키즈가 시험 잘 보는 이유는, 사실 AI도 가능하다는 얘기예요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">48:34</span></div></div>
+      <div class="note A" draggable="true"><p>그 프로그램이 수능특강까지 커버하면 영어 선생님들이 너무 편해지고, 아이들도 굳이 거기까지 갈 이유가 없어요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">47:46</span></div></div>
+    </div>
+  </section>
+
+  <section class="theme" data-theme="t12">
+    <div class="t-head">
+      <div class="t-title">⑫ 가격 수용성 · 과금 구조 · 도입 타이밍 <span class="cnt"></span></div>
+      <div class="t-note">인당 1~2만원선 지불 의향, "처음부터 유료" 선호. 도입 적기는 내신 없는 12월·학기 초·방학 전으로 수렴</div>
+    </div>
+    <div class="notes">
+      <div class="note D" draggable="true"><p>무료로 쓰다가 유료로 바뀌는 것보다 차라리 처음부터 유료가 낫죠. 정액제보다 1인당 과금이 제일 좋고, 인당 1~2만원이면 부담 없이 쓸 것 같아요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">23:03</span></div></div>
+      <div class="note D" draggable="true"><p>아이들한테 정확하게 피드백을 보내 준다면 가격이 중요하겠습니까?</p><div class="meta"><span class="src">D LTS</span><span class="ts">30:36</span></div></div>
+      <div class="note E" draggable="true"><p>온라인 학습의 성취도가 정확하게 나오고 그걸 학부모한테 보여줄 수 있다면, 비용 불문 도입하고 학부모께 추가 비용도 별도로 받을 거예요.</p><div class="meta"><span class="src">E JK</span><span class="ts">49:55</span></div></div>
+      <div class="note H" draggable="true"><p>도입한다면 내신 없는 12월이에요. 그때 교육받고 세팅하죠. 3월부터 6월 초까지는 아무리 좋은 게 있어도 못 해요.</p><div class="meta"><span class="src">H 토피아</span><span class="ts">50:46</span></div></div>
+      <div class="note D" draggable="true"><p>도입은 보통 새 학기 학기 초거나 방학 시즌 전이에요. 아이들이 새로 들어올 때요.</p><div class="meta"><span class="src">D LTS</span><span class="ts">19:17</span></div></div>
+      <div class="note F" draggable="true"><p>교재비가 사이트에 다 오픈돼 있으니 마진을 못 붙여요. 클래스카드 인당 4천원은 교재비에 녹이는 게 제 숙제예요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">37:46</span></div></div>
+      <div class="note F" draggable="true"><p>우리는 총판 고객이지 이퓨처 고객이 아니에요. 자사몰이 있으면 충성도가 생기죠. 신청한 교재가 필요한 만큼 탁탁 오기만 하면 더 고민할 게 없어요.</p><div class="meta"><span class="src">F 해냄</span><span class="ts">76:59</span></div></div>
+      <div class="note K" draggable="true"><p>기존 세팅이 있으니 새 교재 검토가 부담돼요. 총판 선생님께 "요즘 뭐 잘 나가요?" 하고 추천을 받아요.</p><div class="meta"><span class="src">K 세움</span><span class="ts">44:25</span></div></div>
+      <div class="note B" draggable="true"><p>없으면 안 될 정도면 아이당 1만원을 내도 될 것 같아요. 보통 프로그램은 5천~7천원, 1만~1만5천 선. 2만원 넘어가면 아닌 것 같고요.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">29:56</span></div></div>
+      <div class="note B" draggable="true"><p>학원별 커스터마이징만 되면 교재비 쪽으로 받아도 돼요. "서술형도 들어가는 프로그램인데 7천원이에요" 하면 싸죠.</p><div class="meta"><span class="src">B 디에이블</span><span class="ts">33:46</span></div></div>
+      <div class="note C" draggable="true"><p>프로그램 3개를 쓰지만 학부모껜 월 1만원만 받아요. 눈치 보며 올리느니 확실하게 퍼주고, 장기적으로 데려가는 게 목표예요.</p><div class="meta"><span class="src">C 더그로우</span><span class="ts">25:51</span></div></div>
+      <div class="note A" draggable="true"><p>교재비는 제작비까지만 받을 수 있어요. 프리미엄 붙이는 건 정확하게 말씀드리면 불법이고요.</p><div class="meta"><span class="src">A 솔뫼</span><span class="ts">26:27</span></div></div>
+      <div class="note L" draggable="true"><p>클래스카드 단어 프로그램이 요즘 1인당 6000원쯤이에요. 작년엔 원장님이 학기별로 3만원을 받았는데, 그게 다 원장님 마진이었죠.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">53:20</span></div></div>
+      <div class="note L" draggable="true"><p>예전 대형 어학원 다닐 땐 온라인 수업비가 따로 월 2만5천원이었어요. 강제로 다 시켰죠. 근데 작은 학원은 그렇게 못 해요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">54:39</span></div></div>
+      <div class="note L" draggable="true"><p>영어도서관을 하고 싶은데 원비를 올려야 해서 못 하고 있어요. 그렇다고 원장님 혼자 다 부담하기도 부담스럽고요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">56:09</span></div></div>
+    </div>
+  </section>
+
+
+  <section class="theme" data-theme="t13">
+    <div class="t-head">
+      <div class="t-title">⑬ 대형 어학원은 이미 갖췄다 — 진짜 목마른 건 중소형 <span class="cnt"></span></div>
+      <div class="t-note">대형 프랜차이즈 운영 경험자가 직접 던진 세그멘테이션. 자체 시스템을 가진 대형과, 아무것도 없는 중소형은 완전히 다른 시장</div>
+    </div>
+    <div class="notes">
+      <div class="note L" draggable="true"><p>그런 거는 대형 어학원은 필요 없어요. 본인들이 이미 시스템을 갖고 있으니까. 근데 그 외의 학원들은 이런 게 있는지도 모르니까, 홍보해 주시면 훨씬 좋아하실 거예요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">50:18</span></div></div>
+      <div class="note L" draggable="true"><p>체계적인 시스템이 있는 학원들은 시험도 있고 리포트도 보내주니까 이런 고민을 안 하는데, 그 외 중소형 학원들은 그런 게 없잖아요.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">50:56</span></div></div>
+      <div class="note L" draggable="true"><p>이런 걸 회사에서 만들어서 시스템화해 주면, 우리는 그냥 자료만 넣으면 되는 거잖아요. 그럼 원장님들이 엄청 좋아하시죠.</p><div class="meta"><span class="src">L 뛰는수학나는영어</span><span class="ts">51:28</span></div></div>
+    </div>
+  </section>
+</main>
+
+<footer id="foot">
+  출처(12건): 06-16 LTS어학원(접점), 06-17 JK영어수학(접점), 06-18 해냄학원(접점), 06-22 솔뫼 원장(비접점), 06-23 에이플러스스카이에듀(접점) · 토피아어학원 서초(접점), 06-24 전소영 강사(비접점), 06-25 디에이블어학원(접점), 06-29 솔뫼 김소이 강사(비접점), 06-30 세움영어수학(비접점), 07-02 더그로우(접점), 07-03 뛰는수학나는영어 강사(접점 · 대형 프랜차이즈 운영 경험자) 인터뷰 STT 원문. ·
+  인용문은 발화 취지를 유지한 최소 윤문본이며, 타임스탬프로 원문 대조가 가능합니다. STT 오인식 구간은 문맥으로 보정했습니다. ·
+  테마 하단 메모는 관찰 요약으로, 제품 방향에 대한 결론이 아닌 가설 재료입니다.
+</footer>
+
+<script>
+const wall=document.getElementById('wall');
+let activeSrc=null;
+
+function updateCounts(){
+  document.querySelectorAll('.theme').forEach(t=>{
+    const n=t.querySelectorAll('.note:not(.hidden)').length;
+    t.querySelector('.cnt').textContent=n+'장';
+  });
+}
+function applyFilter(){
+  document.querySelectorAll('.note').forEach(n=>{
+    n.classList.toggle('hidden', activeSrc!==null && !n.classList.contains(activeSrc));
+  });
+  document.querySelectorAll('.who').forEach(w=>{
+    w.classList.toggle('dim', activeSrc!==null && w.dataset.src!==activeSrc);
+  });
+  updateCounts();
+}
+document.querySelectorAll('.who').forEach(w=>{
+  w.addEventListener('click',()=>{
+    activeSrc=(activeSrc===w.dataset.src)?null:w.dataset.src;
+    applyFilter();
+  });
+});
+function resetFilter(){activeSrc=null;applyFilter();}
+
+function bindDnD(){
+  let dragged=null;
+  document.querySelectorAll('.note').forEach(n=>{
+    n.addEventListener('dragstart',e=>{dragged=n;n.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    n.addEventListener('dragend',()=>{if(dragged)dragged.classList.remove('dragging');dragged=null;document.querySelectorAll('.theme').forEach(t=>t.classList.remove('dragover'));updateCounts();});
+  });
+  document.querySelectorAll('.theme').forEach(t=>{
+    t.addEventListener('dragover',e=>{e.preventDefault();t.classList.add('dragover');});
+    t.addEventListener('dragleave',()=>t.classList.remove('dragover'));
+    t.addEventListener('drop',e=>{
+      e.preventDefault();t.classList.remove('dragover');
+      if(dragged){t.querySelector('.notes').appendChild(dragged);}
+    });
+  });
+}
+bindDnD();
+updateCounts();
+</script>
+</body>
+</html>

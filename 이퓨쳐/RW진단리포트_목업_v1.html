@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-ALT R/W 진단 리포트 v1 (Vocab·Reading·Writing)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-sans,system-ui,sans-serif);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1a1a18);}
+.tab-bar{display:flex;border-bottom:1px solid var(--color-border-tertiary,#e5e4e0);margin-bottom:1.5rem;}
+.tab-btn{padding:.6rem 1.2rem;font-size:13px;font-weight:500;color:var(--color-text-secondary,#6b6b68);border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;}
+.tab-btn.active{color:var(--color-text-primary,#1a1a18);border-bottom-color:#378ADD;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.report{padding:1.5rem;max-width:920px;margin:0 auto;}
+
+.report-header{border-bottom:.5px solid var(--color-border-tertiary,#e5e4e0);padding-bottom:1.25rem;margin-bottom:1.5rem;}
+.name-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--color-background-info,#e6f1fb);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:15px;color:var(--color-text-info,#0c447c);flex-shrink:0;margin-top:2px;}
+.meta{font-size:13px;color:var(--color-text-secondary,#6b6b68);}
+.header-right{margin-left:auto;text-align:right;}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:8px;}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:500;}
+.badge-cefr{background:var(--color-background-info,#e6f1fb);color:var(--color-text-info,#0c447c);}
+.badge-pt{background:#E1F5EE;color:#085041;}
+.badge-at{background:#EEEDFE;color:#3C3489;}
+.badge-toeic{background:#E6F1FB;color:#185FA5;}
+.badge-ielts{background:#FAECE7;color:#712B13;}
+.badge-toefl{background:#EEEDFE;color:#3C3489;}
+
+/* 3레벨 히어로 */
+.level-trio{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.mini-hero{text-align:center;padding:5px 12px;border-radius:8px;background:var(--color-background-secondary,#f5f5f3);min-width:78px;}
+.mini-hero.primary{background:var(--color-background-info,#e6f1fb);}
+.mini-hero.pending{opacity:.55;}
+.mini-hero-label{font-size:10px;color:var(--color-text-secondary,#6b6b68);}
+.mini-hero-lv{font-size:26px;font-weight:500;line-height:1.15;}
+.mini-hero.primary .mini-hero-lv{color:#185FA5;}
+.mini-hero-sub{font-size:10px;color:var(--color-text-tertiary,#9d9c99);}
+
+.exam-bar{background:var(--color-background-secondary,#f5f5f3);border-radius:8px;padding:.65rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.exam-bar-label{font-size:11px;font-weight:500;color:var(--color-text-secondary,#6b6b68);flex-shrink:0;}
+.exam-item{display:flex;align-items:center;gap:5px;}
+.exam-name{font-size:11px;color:var(--color-text-secondary,#6b6b68);}
+.exam-val{font-size:13px;font-weight:500;color:var(--color-text-primary,#1a1a18);}
+.exam-sep{color:var(--color-border-secondary,#ccc);font-size:13px;}
+
+.metrics-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.5rem;}
+.metric-card{background:var(--color-background-secondary,#f5f5f3);border-radius:8px;padding:.85rem 1rem;}
+.metric-label{font-size:12px;color:var(--color-text-secondary,#6b6b68);margin-bottom:4px;}
+.metric-val{font-size:22px;font-weight:500;}
+.metric-sub{font-size:11px;color:var(--color-text-tertiary,#9d9c99);margin-top:2px;}
+.metric-delta{font-size:13px;font-weight:500;margin-top:2px;}
+.delta-up{color:#2E7D32;}.delta-flat{color:#7B6E00;}.delta-hold{color:#3C3489;}
+
+.growth-banner{border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:14px;}
+.growth-banner.up{background:#E2F0D9;border:1px solid #C8E6C9;}
+.growth-icon{font-size:28px;flex-shrink:0;}
+.growth-text-main{font-size:15px;font-weight:500;}
+.growth-text-sub{font-size:12px;color:var(--color-text-secondary,#6b6b68);margin-top:2px;}
+
+.section-title{font-size:12px;font-weight:500;color:var(--color-text-secondary,#6b6b68);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;margin-top:1.5rem;}
+.section-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:#FFF9C4;color:#7B6E00;margin-left:6px;vertical-align:middle;}
+.section-badge.rw{background:#E1F5EE;color:#085041;}
+.card{background:var(--color-background-primary,#fff);border:.5px solid var(--color-border-tertiary,#e5e4e0);border-radius:10px;padding:1.25rem;margin-bottom:1rem;}
+.card-title{font-size:14px;font-weight:500;margin-bottom:.85rem;}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem;}
+
+.part-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:.5px solid var(--color-border-tertiary,#e5e4e0);}
+.part-row:last-of-type{border-bottom:none;}
+.part-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;min-width:28px;text-align:center;flex-shrink:0;}
+.part-name{font-size:13px;flex:1;}
+.bar-wrap{flex:1;height:6px;background:var(--color-background-secondary,#f5f5f3);border-radius:3px;overflow:hidden;margin:0 8px;position:relative;}
+.bar-fill{height:100%;border-radius:3px;}
+.bar-prev{position:absolute;top:0;height:100%;border-radius:3px;opacity:.3;}
+.part-level{font-size:13px;font-weight:500;min-width:32px;text-align:right;}
+.part-delta{font-size:11px;font-weight:600;min-width:30px;text-align:right;}
+.judgment{font-size:11px;padding:2px 7px;border-radius:4px;margin-left:4px;flex-shrink:0;}
+.j-upper{background:#E2F0D9;color:#2E7D32;}.j-meets{background:#FFF9C4;color:#7B6E00;}.j-below{background:#FDECEA;color:#B71C1C;}
+.part-comment{font-size:11px;color:var(--color-text-secondary,#6b6b68);padding:3px 0 8px 38px;}
+
+/* 게이트 배지 */
+.gate-badge{font-size:10px;padding:1px 7px;border-radius:4px;margin-left:6px;}
+.gate-ok{background:#E2F0D9;color:#2E7D32;}
+.gate-hold{background:var(--color-background-secondary,#f5f5f3);color:#6b6b68;}
+
+/* R2 과정유형 4분할 */
+.proc-wrap{display:grid;grid-template-columns:76px 1fr 46px;gap:6px 8px;align-items:center;margin-top:10px;font-size:11px;}
+.proc-name{color:var(--color-text-secondary,#6b6b68);}
+.proc-bar{height:8px;background:var(--color-background-secondary,#f5f5f3);border-radius:4px;overflow:hidden;}
+.proc-fill{height:100%;border-radius:4px;}
+.proc-val{text-align:right;color:var(--color-text-secondary,#6b6b68);}
+
+/* CAF 칩 */
+.caf-chip{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:var(--color-background-info,#e6f1fb);color:var(--color-text-info,#0c447c);margin-left:4px;}
+.caf-chip.warn{background:#FDECEA;color:#B71C1C;}
+
+.rubric-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid var(--color-border-tertiary,#e5e4e0);}
+.rubric-row:last-of-type{border-bottom:none;}
+.rubric-name{font-size:13px;width:84px;flex-shrink:0;}
+.rubric-bar-wrap{flex:1;height:8px;background:var(--color-background-secondary,#f5f5f3);border-radius:4px;overflow:hidden;position:relative;}
+.rubric-bar-now{height:100%;border-radius:4px;position:absolute;left:0;top:0;}
+.rubric-bar-prev{height:100%;border-radius:4px;position:absolute;left:0;top:0;opacity:.28;}
+.rubric-val{font-size:12px;font-weight:500;min-width:28px;text-align:right;}
+.rubric-pct{font-size:11px;min-width:54px;text-align:right;color:var(--color-text-secondary,#6b6b68);}
+.rubric-delta{font-size:11px;font-weight:600;min-width:36px;text-align:right;}
+.pct-up{color:#2E7D32;}.pct-flat{color:#7B6E00;}.pct-down{color:#B71C1C;}
+
+.script-item{border:.5px solid var(--color-border-tertiary,#e5e4e0);border-radius:8px;margin-bottom:.6rem;overflow:hidden;}
+.script-head{display:flex;align-items:center;gap:8px;padding:.5rem .85rem;background:var(--color-background-secondary,#f5f5f3);border-bottom:.5px solid var(--color-border-tertiary,#e5e4e0);}
+.script-num{font-size:11px;font-weight:500;color:var(--color-text-secondary,#6b6b68);}
+.script-type{font-size:11px;padding:1px 7px;border-radius:4px;}
+.stype-grammar{background:#FDECEA;color:#B71C1C;}
+.stype-expression{background:#FFF9C4;color:#7B6E00;}
+.script-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.script-col{padding:.7rem .85rem;}
+.script-col-label{font-size:10px;font-weight:500;color:var(--color-text-tertiary,#9d9c99);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.script-col-text{font-size:13px;line-height:1.5;}
+.script-orig{border-right:.5px solid var(--color-border-tertiary,#e5e4e0);}
+.err-word{text-decoration:underline;text-decoration-color:#E53935;text-decoration-thickness:2px;color:#B71C1C;}
+.fix-word{color:#2E7D32;font-weight:500;}
+
+.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.75rem;}
+.exam-card{border:.5px solid var(--color-border-tertiary,#e5e4e0);border-radius:8px;padding:.75rem 1rem;}
+.exam-card-name{font-size:11px;font-weight:500;color:var(--color-text-secondary,#6b6b68);margin-bottom:4px;}
+.exam-card-val{font-size:20px;font-weight:500;margin-bottom:2px;}
+.exam-card-sub{font-size:11px;color:var(--color-text-secondary,#6b6b68);}
+.exam-card-arrow{font-size:12px;margin-top:4px;font-weight:500;}
+.exam-note{font-size:11px;color:var(--color-text-secondary,#6b6b68);background:var(--color-background-secondary,#f5f5f3);border-radius:6px;padding:.5rem .75rem;}
+
+.rx-card{border:.5px solid var(--color-border-tertiary,#e5e4e0);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem;display:flex;align-items:flex-start;gap:10px;}
+.rx-rank{font-size:11px;font-weight:500;min-width:18px;color:var(--color-text-secondary,#6b6b68);}
+.rx-body{flex:1;}
+.rx-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.rx-desc{font-size:12px;color:var(--color-text-secondary,#6b6b68);}
+.rx-badge{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--color-background-info,#e6f1fb);color:var(--color-text-info,#0c447c);margin-left:auto;flex-shrink:0;}
+
+.note{font-size:12px;color:var(--color-text-secondary,#6b6b68);background:var(--color-background-secondary,#f5f5f3);border-radius:8px;padding:.6rem .85rem;margin-top:.75rem;}
+.at-label{font-size:11px;padding:1px 7px;border-radius:4px;margin-left:6px;}
+.at1-lbl{background:#f5f5f3;color:#6b6b68;}.at2-lbl{background:#EEEDFE;color:#3C3489;}
+.legend{display:flex;gap:14px;margin-top:.75rem;font-size:12px;color:var(--color-text-secondary,#6b6b68);flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;}
+.leg-line{width:18px;height:3px;border-radius:2px;display:inline-block;}
+.leg-dash{width:18px;border-top:2px dashed;display:inline-block;}
+.leg-area{width:14px;height:8px;border-radius:2px;display:inline-block;}
+.phase-foot{font-size:11px;color:var(--color-text-tertiary,#9d9c99);border-top:.5px solid var(--color-border-tertiary,#e5e4e0);margin-top:1.5rem;padding-top:1rem;}
+@media(max-width:600px){.two-col{grid-template-columns:1fr;}.metrics-row{grid-template-columns:repeat(2,1fr);}.exam-grid{grid-template-columns:1fr;}.script-body{grid-template-columns:1fr;}.script-orig{border-right:none;border-bottom:.5px solid var(--color-border-tertiary,#e5e4e0);}}
+</style>
+</head>
+<body>
+<div class="report">
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('pt')">📋 Placement Test (진단)</button>
+  <button class="tab-btn" onclick="switchTab('at')">📈 Achievement Test (성장)</button>
+</div>
+
+<!-- ═══════════════ PT 패널 ═══════════════ -->
+<div id="panel-pt" class="tab-panel active">
+
+  <div class="report-header">
+    <div class="name-row">
+      <div class="avatar">이서</div>
+      <div>
+        <div style="font-size:16px;font-weight:500;">이서연</div>
+        <div class="meta">응시일 2026-04-01 &nbsp;·&nbsp; 소요 21분 &nbsp;·&nbsp; 문항 23개 &nbsp;·&nbsp; R/W 트랙 PT</div>
+        <span class="badge badge-pt" style="margin-top:6px;">Placement Test</span>
+      </div>
+      <div class="header-right">
+        <div class="level-trio">
+          <div class="mini-hero"><div class="mini-hero-label">Vocab</div><div class="mini-hero-lv" style="color:#1D9E75;">L11</div><div class="mini-hero-sub">~5,500 WF</div></div>
+          <div class="mini-hero primary"><div class="mini-hero-label">Reading</div><div class="mini-hero-lv">L10</div><div class="mini-hero-sub">B2 하</div></div>
+          <div class="mini-hero"><div class="mini-hero-label">Writing</div><div class="mini-hero-lv" style="color:#7F77DD;">L9</div><div class="mini-hero-sub">B1 상</div></div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-cefr">Reading B2 · Writing B1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-bar">
+    <span class="exam-bar-label">공인시험 예상</span>
+    <div class="exam-item"><span class="exam-name">TOEIC RC</span><span class="exam-val">350 – 400</span></div>
+    <span class="exam-sep">·</span>
+    <div class="exam-item"><span class="exam-name">TOEFL R</span><span class="exam-val">18 – 21</span></div>
+    <span class="exam-sep">·</span>
+    <div class="exam-item"><span class="exam-name">IELTS R</span><span class="exam-val">5.5 – 6.5</span></div>
+    <span class="exam-sep">·</span>
+    <div class="exam-item"><span class="exam-name">IELTS W</span><span class="exam-val">5.5 – 6.0</span></div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-label">추정 어휘량</div><div class="metric-val">5,500</div><div class="metric-sub">word-family (Nation)</div></div>
+    <div class="metric-card"><div class="metric-label">스킬 편차</div><div class="metric-val">2.0</div><div class="metric-sub">정상 범위 (≤3)</div></div>
+    <div class="metric-card"><div class="metric-label">CAT 수렴 효율</div><div class="metric-val">84%</div><div class="metric-sub">최소 문항 대비</div></div>
+    <div class="metric-card"><div class="metric-label">독해 이해도 게이트</div><div class="metric-val" style="color:#2E7D32;">통과</div><div class="metric-sub">이해도 78% (≥70%)</div></div>
+  </div>
+
+  <!-- 1: CAT 궤적 -->
+  <div class="section-title">1 · 어휘·독해 CAT 수렴 경로</div>
+  <div class="card">
+    <div class="card-title">문항 단위 레벨 궤적 (P1 Vocab → P2 Reading) <span style="font-size:11px;color:#9d9c99;">· Writing은 CAT 아님(§3)</span></div>
+    <div style="position:relative;height:200px;"><canvas id="pt-traj"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><span class="leg-line" style="background:#378ADD;height:3px;"></span>레벨 궤적</div>
+      <div class="legend-item"><span class="leg-area" style="background:rgba(55,138,221,0.15);border:1px solid rgba(55,138,221,0.3);"></span>신뢰 구간</div>
+      <div class="legend-item"><span class="leg-dash" style="border-color:#aaa;"></span>파트 경계</div>
+    </div>
+  </div>
+
+  <!-- 2: Reading 3대 KPI -->
+  <div class="section-title">2 · Reading 3대 KPI <span class="section-badge rw">Simple View of Reading</span></div>
+  <div class="card">
+    <div class="card-title">KPI 축별 레벨 &amp; 동일레벨 평균 대비 위치</div>
+    <div class="rubric-row">
+      <div class="rubric-name">R1 어휘 지식</div>
+      <div class="rubric-bar-wrap"><div class="rubric-bar-now" style="width:61%;background:#1D9E75;"></div></div>
+      <div class="rubric-val">L11</div><div class="rubric-pct pct-up">상위 30%</div>
+      <div class="rubric-delta" style="color:#1D9E75;font-size:10px;">강점</div>
+    </div>
+    <div class="rubric-row">
+      <div class="rubric-name">R2 이해도</div>
+      <div class="rubric-bar-wrap"><div class="rubric-bar-now" style="width:56%;background:#378ADD;"></div></div>
+      <div class="rubric-val">L10</div><div class="rubric-pct pct-flat">상위 50%</div>
+      <div class="rubric-delta" style="color:#378ADD;font-size:10px;">과정편중</div>
+    </div>
+    <div class="rubric-row">
+      <div class="rubric-name">R3 유창성</div>
+      <div class="rubric-bar-wrap"><div class="rubric-bar-now" style="width:50%;background:#BA7517;"></div></div>
+      <div class="rubric-val">L9</div><div class="rubric-pct pct-flat">상위 54%</div>
+      <span class="gate-badge gate-ok">WPM 142 · 게이트 통과</span>
+    </div>
+    <div class="note" style="margin-top:1rem;"><strong>R2 이해도 — 과정 유형별 프로파일 (PISA/PIRLS)</strong>
+      <div class="proc-wrap">
+        <span class="proc-name">정보 확인</span><div class="proc-bar"><div class="proc-fill" style="width:85%;background:#1D9E75;"></div></div><span class="proc-val">85%</span>
+        <span class="proc-name">직접 추론</span><div class="proc-bar"><div class="proc-fill" style="width:70%;background:#378ADD;"></div></div><span class="proc-val">70%</span>
+        <span class="proc-name">통합·해석</span><div class="proc-bar"><div class="proc-fill" style="width:55%;background:#D85A30;"></div></div><span class="proc-val">55%</span>
+        <span class="proc-name">평가·비판</span><div class="proc-bar"><div class="proc-fill" style="width:48%;background:#D4537E;"></div></div><span class="proc-val">48%</span>
+      </div>
+      <div style="margin-top:8px;">📊 정보 확인은 강하나 <strong>통합·해석·평가·비판이 취약</strong> — 고차 독해 처방 대상.</div>
+    </div>
+  </div>
+
+  <!-- 3: Writing 5대 KPI -->
+  <div class="section-title">3 · Writing 5대 KPI <span class="section-badge rw">Jacobs Profile + CAF</span></div>
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">5축 밸런스 (동일레벨 평균 대비)</div>
+      <div style="position:relative;height:240px;"><canvas id="wr-radar"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">축별 레벨 + CAF 객관수치</div>
+      <div class="part-row"><span class="part-tag" style="background:#E1F5EE;color:#085041;">W1</span><span class="part-name">내용·과제충실 <span style="font-size:10px;opacity:.6;">30%</span></span><span class="part-level">L10</span><span class="judgment j-meets">중</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#E6F1FB;color:#0C447C;">W2</span><span class="part-name">구성·응집성 <span style="font-size:10px;opacity:.6;">20%</span></span><span class="part-level">L9</span><span class="judgment j-meets">중</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#FAECE7;color:#712B13;">W3</span><span class="part-name">어휘 자원 <span class="caf-chip">MTLD 62</span></span><span class="part-level">L10</span><span class="judgment j-meets">중</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#EEEDFE;color:#3C3489;">W4</span><span class="part-name">문법 <span class="caf-chip warn">오류율 8.2% · MLC 1.4</span></span><span class="part-level">L8</span><span class="judgment j-below">하</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#f0e9dd;color:#7B6E00;">W5</span><span class="part-name">어법·표기 <span style="font-size:10px;opacity:.6;">5%</span></span><span class="part-level">L9</span><span class="judgment j-meets">중</span></div>
+      <div class="note" style="margin-top:.85rem;">CAF 자동수치가 LLM 채점을 뒷받침 — <strong>문법(W4)이 최약</strong>, 오류율 8.2%로 동일레벨 평균(5%) 초과.</div>
+    </div>
+  </div>
+
+  <!-- 4: 작문 오류 문장 분석 -->
+  <div class="section-title">4 · 작문 오류 문장 분석 <span class="section-badge">13개 유형 자동 분류</span></div>
+  <div class="card">
+    <div class="card-title">학생 작문 원문 → 교정 (ASR 불필요 · 텍스트 직접 분석)</div>
+    <div class="script-item">
+      <div class="script-head"><span class="script-num">#1</span><span class="script-type stype-grammar">시제 오류</span><span style="font-size:11px;color:#6b6b68;margin-left:auto;">Writing 과제 2문단</span></div>
+      <div class="script-body">
+        <div class="script-col script-orig"><div class="script-col-label">작문 원문</div><div class="script-col-text">I <span class="err-word">have finished</span> my project yesterday.</div></div>
+        <div class="script-col"><div class="script-col-label">교정 제안</div><div class="script-col-text">I <span class="fix-word">finished</span> my project yesterday.</div></div>
+      </div>
+    </div>
+    <div class="script-item">
+      <div class="script-head"><span class="script-num">#2</span><span class="script-type stype-grammar">관사 누락</span><span style="font-size:11px;color:#6b6b68;margin-left:auto;">Writing 과제 1문단</span></div>
+      <div class="script-body">
+        <div class="script-col script-orig"><div class="script-col-label">작문 원문</div><div class="script-col-text">She is <span class="err-word">best student</span> in class.</div></div>
+        <div class="script-col"><div class="script-col-label">교정 제안</div><div class="script-col-text">She is <span class="fix-word">the best student in the</span> class.</div></div>
+      </div>
+    </div>
+    <div class="script-item">
+      <div class="script-head"><span class="script-num">#3</span><span class="script-type stype-expression">표현 레벨 향상 가능</span><span style="font-size:11px;color:#6b6b68;margin-left:auto;">레지스터 상향</span></div>
+      <div class="script-body">
+        <div class="script-col script-orig"><div class="script-col-label">작문 원문</div><div class="script-col-text">The movie was so good and fun.</div></div>
+        <div class="script-col"><div class="script-col-label">교정 제안</div><div class="script-col-text"><span class="fix-word">The film was remarkably compelling.</span></div></div>
+      </div>
+    </div>
+    <div class="note">작문 오류: 시제 2건 · 관사 1건 · 표현 향상 3건 &nbsp;|&nbsp; <strong>Reading 오답 과정유형</strong>: 평가·비판 2/3 오답 · 통합·해석 1/4 오답</div>
+  </div>
+
+  <!-- 5: 처방 -->
+  <div class="section-title">5 · 학습 처방</div>
+  <div class="card">
+    <div class="rx-card"><div class="rx-rank">#1</div><div class="rx-body"><div class="rx-title">고차 독해 취약 (통합·해석 55% · 평가·비판 48%)</div><div class="rx-desc">정보 확인은 강하나 추론·통합·비판이 약함 → 지문 구조·함의 추론 훈련 우선</div></div><div class="rx-badge">추론 독해 모듈</div></div>
+    <div class="rx-card"><div class="rx-rank">#2</div><div class="rx-body"><div class="rx-title">작문 문법 최약 (W4 L8 · 오류율 8.2%)</div><div class="rx-desc">시제·관사 오류 반복 → 시제 체계·관사 집중 연습</div></div><div class="rx-badge">문법 집중 훈련</div></div>
+    <div class="rx-card"><div class="rx-rank">#3</div><div class="rx-body"><div class="rx-title">어휘 강점 — 표현 레지스터로 확장</div><div class="rx-desc">Vocab L11 강점. 구어체→격식체 표현 상향으로 Writing 어휘자원 심화</div></div><div class="rx-badge">표현 확장 모듈</div></div>
+  </div>
+
+  <!-- 6: 공인시험 -->
+  <div class="section-title">6 · 공인시험 예상 점수 상세 <span class="section-badge">신규</span></div>
+  <div class="card">
+    <div class="card-title">현재 Reading L10 · Writing L9 기준 예상 구간</div>
+    <div class="exam-grid">
+      <div class="exam-card"><div class="exam-card-name">TOEIC RC</div><div class="exam-card-val" style="color:#185FA5;">350 – 400</div><div class="exam-card-sub">Reading 기반</div><div class="exam-card-arrow" style="color:#2E7D32;">Reading L12 시 → 420+ 예상</div></div>
+      <div class="exam-card"><div class="exam-card-name">TOEFL Reading</div><div class="exam-card-val" style="color:#3C3489;">18 – 21</div><div class="exam-card-sub">점수 범위 0–30</div><div class="exam-card-arrow" style="color:#2E7D32;">Reading L12 시 → 22–25 예상</div></div>
+      <div class="exam-card"><div class="exam-card-name">IELTS Reading</div><div class="exam-card-val" style="color:#712B13;">5.5 – 6.5</div><div class="exam-card-sub">Band 5.5–6.5</div><div class="exam-card-arrow" style="color:#2E7D32;">Reading L12 시 → 7.0 예상</div></div>
+      <div class="exam-card"><div class="exam-card-name">IELTS Writing</div><div class="exam-card-val" style="color:#712B13;">5.5 – 6.0</div><div class="exam-card-sub">Writing 기반</div><div class="exam-card-arrow" style="color:#2E7D32;">Writing L11 시 → 6.5 예상</div></div>
+    </div>
+    <div class="exam-note">📌 CEFR 연구 및 각 시험 공식 레벨 기술서 기반 예상 구간. 파일럿 데이터 축적 후 실측 보정됩니다.</div>
+  </div>
+
+</div><!-- /panel-pt -->
+
+
+<!-- ═══════════════ AT 패널 ═══════════════ -->
+<div id="panel-at" class="tab-panel">
+
+  <div class="report-header">
+    <div class="name-row">
+      <div class="avatar">이서</div>
+      <div>
+        <div style="font-size:16px;font-weight:500;">이서연</div>
+        <div class="meta">직전 진단(PT) 2026-04-01 &nbsp;→&nbsp; 이번 AT 2026-05-15 &nbsp;·&nbsp; 학습 44일</div>
+        <span class="badge badge-at" style="margin-top:6px;">Achievement Test · 체인 2회차</span>
+      </div>
+      <div class="header-right">
+        <div class="level-trio">
+          <div class="mini-hero"><div class="mini-hero-label">Vocab</div><div class="mini-hero-lv" style="color:#1D9E75;">L13</div><div class="mini-hero-sub">▲ +2</div></div>
+          <div class="mini-hero primary"><div class="mini-hero-label">Reading</div><div class="mini-hero-lv">L12</div><div class="mini-hero-sub">▲ +2</div></div>
+          <div class="mini-hero"><div class="mini-hero-label">Writing</div><div class="mini-hero-lv" style="color:#7F77DD;">L10</div><div class="mini-hero-sub">▲ +1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="growth-banner up">
+    <div class="growth-icon">🎉</div>
+    <div>
+      <div class="growth-text-main">44일 학습 후 <strong>Reading +2 · Vocab +2 · Writing +1 레벨 성장</strong></div>
+      <div class="growth-text-sub">직전 진단 대비: Reading L10 → L12 &nbsp;|&nbsp; IELTS R 5.5-6.5 → 7.0 예상 구간 향상</div>
+    </div>
+  </div>
+
+  <div class="exam-bar">
+    <span class="exam-bar-label">공인시험 성장</span>
+    <div class="exam-item"><span class="exam-name">TOEIC RC</span><span class="exam-val" style="color:#6b6b68;">350-400</span><span style="color:#2E7D32;margin:0 4px;">→</span><span class="exam-val" style="color:#2E7D32;">430-460</span></div>
+    <span class="exam-sep">·</span>
+    <div class="exam-item"><span class="exam-name">IELTS R</span><span class="exam-val" style="color:#6b6b68;">5.5-6.5</span><span style="color:#2E7D32;margin:0 4px;">→</span><span class="exam-val" style="color:#2E7D32;">7.0</span></div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-label">직전 Reading</div><div class="metric-val" style="color:#6b6b68;">L10</div><div class="metric-sub">B2 하</div></div>
+    <div class="metric-card"><div class="metric-label">이번 Reading</div><div class="metric-val">L12</div><div class="metric-delta delta-up">▲ +2 레벨</div></div>
+    <div class="metric-card"><div class="metric-label">성장 KPI 축</div><div class="metric-val">7 / 8</div><div class="metric-sub">1개 축 정체(W4)</div></div>
+    <div class="metric-card"><div class="metric-label">하한 보호</div><div class="metric-val">미적용</div><div class="metric-sub">직전 초과 달성</div></div>
+  </div>
+
+  <!-- 1: CAT 경로 비교 -->
+  <div class="section-title">1 · CAT 수렴 경로 비교</div>
+  <div class="card">
+    <div class="card-title">직전 진단 vs 이번 AT — 문항 단위 레벨 궤적</div>
+    <div style="position:relative;height:210px;"><canvas id="at-traj"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><span class="leg-line" style="background:#534AB7;height:3px;"></span>이번 AT</div>
+      <div class="legend-item"><span class="leg-dash" style="border-color:#aaa;"></span>직전 진단</div>
+      <div class="legend-item"><span class="leg-area" style="background:rgba(83,74,183,0.13);border:1px solid rgba(83,74,183,0.3);"></span>이번 신뢰 구간</div>
+    </div>
+  </div>
+
+  <!-- 2: Reading KPI 성장 -->
+  <div class="section-title">2 · Reading 3대 KPI 성장</div>
+  <div class="card">
+    <div class="card-title">축별 직전 → 이번 변화 <span class="at1-lbl at-label">직전</span><span class="at2-lbl at-label">이번</span></div>
+    <div class="rubric-row"><div class="rubric-name">R1 어휘 지식</div><div class="rubric-bar-wrap"><div class="rubric-bar-prev" style="width:61%;background:#1D9E75;"></div><div class="rubric-bar-now" style="width:72%;background:#1D9E75;"></div></div><div class="rubric-val">L13</div><div class="rubric-pct pct-up">상위 24%</div><div class="rubric-delta delta-up">+2 ↑</div></div>
+    <div class="rubric-row"><div class="rubric-name">R2 이해도</div><div class="rubric-bar-wrap"><div class="rubric-bar-prev" style="width:56%;background:#378ADD;"></div><div class="rubric-bar-now" style="width:67%;background:#378ADD;"></div></div><div class="rubric-val">L12</div><div class="rubric-pct pct-up">상위 33%</div><div class="rubric-delta delta-up">+2 ↑</div></div>
+    <div class="rubric-row"><div class="rubric-name">R3 유창성</div><div class="rubric-bar-wrap"><div class="rubric-bar-prev" style="width:50%;background:#BA7517;"></div><div class="rubric-bar-now" style="width:56%;background:#BA7517;"></div></div><div class="rubric-val">L10</div><div class="rubric-pct pct-flat">상위 49%</div><div class="rubric-delta delta-up">+1 ↑</div></div>
+    <div class="note" style="margin-top:.85rem;">📈 R2 과정유형 <strong>통합·해석 55% → 68%</strong> 개선 — 처방(추론 독해)이 효과. 평가·비판은 48% → 56%로 완만.</div>
+  </div>
+
+  <!-- 3: Writing KPI 성장 -->
+  <div class="section-title">3 · Writing 5대 KPI 성장</div>
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">5축 직전 vs 이번</div>
+      <div style="position:relative;height:240px;"><canvas id="at-wradar"></canvas></div>
+      <div class="legend"><div class="legend-item"><span class="leg-line" style="background:#534AB7;height:3px;"></span>이번</div><div class="legend-item"><span class="leg-dash" style="border-color:#aaa;"></span>직전</div></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">축별 변화 + CAF</div>
+      <div class="part-row"><span class="part-tag" style="background:#E1F5EE;color:#085041;">W1</span><span class="part-name">내용·과제충실</span><span class="part-level">L11</span><span class="part-delta delta-up">+1</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#E6F1FB;color:#0C447C;">W2</span><span class="part-name">구성·응집성</span><span class="part-level">L10</span><span class="part-delta delta-up">+1</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#FAECE7;color:#712B13;">W3</span><span class="part-name">어휘 자원 <span class="caf-chip">MTLD 62→71</span></span><span class="part-level">L11</span><span class="part-delta delta-up">+1</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#EEEDFE;color:#3C3489;">W4</span><span class="part-name">문법 <span class="caf-chip warn">오류율 8.2%→7.9%</span></span><span class="part-level">L8</span><span class="part-delta delta-flat">±0</span></div>
+      <div class="part-row"><span class="part-tag" style="background:#f0e9dd;color:#7B6E00;">W5</span><span class="part-name">어법·표기</span><span class="part-level">L10</span><span class="part-delta delta-up">+1</span></div>
+      <div class="note" style="margin-top:.85rem;">📌 <strong>문법(W4) 정체 (±0)</strong> — 시제 오류 패턴 지속(§4). 오류율 감소 미미. 집중 훈련 권장.</div>
+    </div>
+  </div>
+
+  <!-- 4: 작문 오류 지속/해소 -->
+  <div class="section-title">4 · 작문 오류 지속/해소 비교</div>
+  <div class="card">
+    <div class="card-title">직전 vs 이번 — 동일 오류 유형의 지속/해소</div>
+    <div class="script-item">
+      <div class="script-head"><span class="script-num">시제 오류</span><span class="script-type stype-grammar" style="background:#FDECEA;color:#B71C1C;">직전 → 이번 지속</span><span style="font-size:11px;color:#B71C1C;margin-left:auto;font-weight:500;">⚠ 해소되지 않음</span></div>
+      <div class="script-body">
+        <div class="script-col script-orig"><div class="script-col-label">직전 원문</div><div class="script-col-text">I <span class="err-word">have finished</span> my project yesterday.</div></div>
+        <div class="script-col"><div class="script-col-label">이번 원문</div><div class="script-col-text">She <span class="err-word">has visited</span> Busan last week.</div></div>
+      </div>
+    </div>
+    <div class="script-item">
+      <div class="script-head"><span class="script-num">관사 누락</span><span class="script-type stype-expression" style="background:#E2F0D9;color:#2E7D32;">직전 → 이번 해소</span><span style="font-size:11px;color:#2E7D32;margin-left:auto;font-weight:500;">✓ 개선됨</span></div>
+      <div class="script-body">
+        <div class="script-col script-orig"><div class="script-col-label">직전 원문</div><div class="script-col-text">She is <span class="err-word">best student</span> in class.</div></div>
+        <div class="script-col"><div class="script-col-label">이번 원문</div><div class="script-col-text">He is <span class="fix-word">the most diligent</span> member of the team.</div></div>
+      </div>
+    </div>
+    <div class="note">직전 대비: 시제 오류 2건 유지 · 관사 누락 1→0건 해소 · 표현 향상 1→3건 증가</div>
+  </div>
+
+  <!-- 5: 처방 -->
+  <div class="section-title">5 · 학습 처방 — 다음 성장 단계</div>
+  <div class="card">
+    <div class="rx-card"><div class="rx-rank">#1</div><div class="rx-body"><div class="rx-title">작문 문법 정체 (W4 ±0)</div><div class="rx-desc">시제 오류 지속. 완료·과거 시제 구분 집중 → 오류율 5% 이하 목표</div></div><div class="rx-badge">시제 집중 훈련</div></div>
+    <div class="rx-card"><div class="rx-rank">#2</div><div class="rx-body"><div class="rx-title">평가·비판 독해 성장 미흡 (56%)</div><div class="rx-desc">통합·해석은 개선됐으나 비판적 독해 완만 → 논증 분석 지문 보강</div></div><div class="rx-badge">비판 독해 모듈</div></div>
+    <div class="rx-card"><div class="rx-rank">#3</div><div class="rx-body"><div class="rx-title">어휘·이해도 강점 — 심화 진입</div><div class="rx-desc">Vocab L13·Reading L12 강점. 학술 지문·긴 작문으로 C1 진입 단계</div></div><div class="rx-badge">학술 리딩·에세이</div></div>
+  </div>
+
+  <!-- 6: 공인시험 성장 예상 -->
+  <div class="section-title">6 · 공인시험 성장 예상 <span class="section-badge">신규</span></div>
+  <div class="card">
+    <div class="card-title">직전 → 이번 레벨 성장에 따른 공인시험 구간 변화</div>
+    <div class="exam-grid">
+      <div class="exam-card"><div class="exam-card-name">TOEIC RC</div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#6b6b68;font-weight:500;">350-400</span><span style="color:#2E7D32;font-size:18px;">→</span><span style="font-size:20px;font-weight:500;color:#2E7D32;">430-460</span></div><div class="exam-card-sub">다음 목표: 490+ (Reading L14)</div></div>
+      <div class="exam-card"><div class="exam-card-name">TOEFL Reading</div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#6b6b68;font-weight:500;">18-21</span><span style="color:#2E7D32;font-size:18px;">→</span><span style="font-size:20px;font-weight:500;color:#2E7D32;">22-25</span></div><div class="exam-card-sub">다음 목표: 26+ (Reading L14)</div></div>
+      <div class="exam-card"><div class="exam-card-name">IELTS Reading</div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#6b6b68;font-weight:500;">5.5-6.5</span><span style="color:#2E7D32;font-size:18px;">→</span><span style="font-size:20px;font-weight:500;color:#2E7D32;">7.0</span></div><div class="exam-card-sub">다음 목표: 7.5+ (Reading L14)</div></div>
+      <div class="exam-card"><div class="exam-card-name">IELTS Writing</div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#6b6b68;font-weight:500;">5.5-6.0</span><span style="color:#2E7D32;font-size:18px;">→</span><span style="font-size:20px;font-weight:500;color:#2E7D32;">6.0-6.5</span></div><div class="exam-card-sub">문법(W4) 보완 시 6.5 안정권</div></div>
+    </div>
+    <div class="exam-note">📌 예상 구간이므로 실제 시험과 차이가 있을 수 있습니다. Reading L14 달성 시 대부분 공인시험 상위 구간 진입이 예상됩니다.</div>
+  </div>
+
+</div><!-- /panel-at -->
+
+<div class="phase-foot">
+  <strong>MVP(12월) 범위</strong>: 헤더(Vocab·Reading) · §1 CAT 궤적 · §2 Reading 3축 · §5 처방 · §6 공인시험(Reading). &nbsp;
+  <strong>P1 활성</strong>: §3 Writing 5축·CAF · §4 작문 오류 분석 · AT 탭 전체(성장·체인). &nbsp;
+  본 목업은 <em>목표 상태(전체 활성)</em>를 보여준다. 스펙: P0-2-2 · 모든 수치는 예시 데이터.
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&id==='pt')||(i===1&&id==='at')));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+}
+const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+const tc=isDark?'#c2c0b6':'#3d3d3a';
+const gc=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+
+// PT 궤적 (Vocab → Reading)
+const ptL=['시작','V1','V2','V3','V4','R1','R2','R3','R4'];
+const ptD=[9,11,13,12,11,11,10,10,10];
+const ptH=[9,12,14,13,12,12,11,11,11];
+const ptLo=[9,10,12,11,10,10,9,9,9];
+const ptB=['','','','','Reading 시작','','','',''];
+new Chart(document.getElementById('pt-traj'),{type:'line',data:{labels:ptL,datasets:[
+  {data:ptH,fill:'+1',borderWidth:0,pointRadius:0,backgroundColor:isDark?'rgba(55,138,221,0.13)':'rgba(55,138,221,0.11)',tension:.35},
+  {data:ptLo,fill:false,borderWidth:0,pointRadius:0,tension:.35},
+  {label:'궤적',data:ptD,borderColor:'#378ADD',borderWidth:2.5,pointBackgroundColor:'#378ADD',pointRadius:4,pointHoverRadius:6,tension:.35,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===2?' L'+ctx.raw:null}}},scales:{
+  y:{min:6,max:18,ticks:{stepSize:2,color:tc,font:{size:11},callback:v=>'L'+v},grid:{color:gc}},
+  x:{ticks:{color:tc,font:{size:10},maxRotation:0},grid:{color:ctx=>ptB[ctx.index]?(isDark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.12)'):gc}}
+}}});
+
+// Writing 레이더 (5축)
+new Chart(document.getElementById('wr-radar'),{type:'radar',data:{labels:['내용','구성','어휘','문법','어법'],datasets:[
+  {label:'이번',data:[10,9,10,8,9],borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.14)',borderWidth:2,pointBackgroundColor:'#7F77DD',pointRadius:4},
+  {label:'동일레벨 평균',data:[9,9,9,9,9],borderColor:isDark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.13)',backgroundColor:'transparent',borderWidth:1,borderDash:[4,3],pointRadius:0}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:18,ticks:{stepSize:6,color:tc,font:{size:10},backdropColor:'transparent',callback:v=>'L'+v},grid:{color:gc},angleLines:{color:gc},pointLabels:{color:tc,font:{size:11}}}}}});
+
+// AT 궤적
+const atL=['시작','V1','V2','V3','V4','R1','R2','R3','R4'];
+const atNow=[11,13,15,14,13,13,12,12,12];
+const atH=[11,14,16,15,14,14,13,13,13];
+const atLo=[11,12,14,13,12,12,11,11,11];
+const atPrev=[9,11,13,12,11,11,10,10,10];
+const atB=['','','','','Reading 시작','','','',''];
+new Chart(document.getElementById('at-traj'),{type:'line',data:{labels:atL,datasets:[
+  {data:atH,fill:'+1',borderWidth:0,pointRadius:0,backgroundColor:isDark?'rgba(83,74,183,0.12)':'rgba(83,74,183,0.1)',tension:.35},
+  {data:atLo,fill:false,borderWidth:0,pointRadius:0,tension:.35},
+  {label:'이번',data:atNow,borderColor:'#534AB7',borderWidth:2.5,pointBackgroundColor:'#534AB7',pointRadius:4,tension:.35,fill:false},
+  {label:'직전',data:atPrev,borderColor:isDark?'#666':'#bbb',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:.35,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.datasetIndex===2||ctx.datasetIndex===3)?' L'+ctx.raw:null}}},scales:{
+  y:{min:6,max:18,ticks:{stepSize:2,color:tc,font:{size:11},callback:v=>'L'+v},grid:{color:gc}},
+  x:{ticks:{color:tc,font:{size:10},maxRotation:0},grid:{color:ctx=>atB[ctx.index]?(isDark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.12)'):gc}}
+}}});
+
+// AT Writing 레이더
+new Chart(document.getElementById('at-wradar'),{type:'radar',data:{labels:['내용','구성','어휘','문법','어법'],datasets:[
+  {label:'이번',data:[11,10,11,8,10],borderColor:'#534AB7',backgroundColor:'rgba(83,74,183,0.13)',borderWidth:2,pointBackgroundColor:'#534AB7',pointRadius:4},
+  {label:'직전',data:[10,9,10,8,9],borderColor:isDark?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.2)',backgroundColor:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)',borderWidth:1.5,borderDash:[4,3],pointRadius:3,pointBackgroundColor:isDark?'#888':'#bbb'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:18,ticks:{stepSize:6,color:tc,font:{size:10},backdropColor:'transparent',callback:v=>'L'+v},grid:{color:gc},angleLines:{color:gc},pointLabels:{color:tc,font:{size:11}}}}}});
+</script>
+</body>
+</html>

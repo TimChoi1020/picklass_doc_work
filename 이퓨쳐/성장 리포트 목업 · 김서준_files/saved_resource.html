@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!-- saved from url=(0253)https://223ada51-b5b9-421a-84bb-76f49f6d92d4.frame.claudeusercontent.com/_f/1784009205-cb3f/?__frame_t=IuR2nJ-dpzjasIt_lS7eWT4Y.b889b7e4-2ca6-4f05-bc99-5e1db9798bb3.f6c57e22-2311-4f67-ae37-3dd7db636f1c.1784012810&__frame_v=manifest.6e3f52046dcf8870.json -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- frame-runtime --><!--<base href="/_f/1784009205-cb3f/">--><base href="."><script>window.__FRAME_PREAMBLE={"capabilities":{"downloads":"downloads.DUzXFHNF.js","mcp":"mcp.CLzOm9JX.js","permissions":"permissions.C9OCnDjh.js","self":"self.DqF_PxOe.js"},"transforms":"_transforms.DYk1Ltlh.js","comments":"_comments.CTmG5kkF.js"}</script><script>(function(){"use strict";const ce="modulepreload",le=function(e){return"/"+e},ue={},x=function(t,n,u){let o=Promise.resolve();function s(f){const a=new Event("vite:preloadError",{cancelable:!0});if(a.payload=f,window.dispatchEvent(a),!a.defaultPrevented)throw f}return o.then(f=>{for(const a of f||[])a.status==="rejected"&&s(a.reason);return t().catch(s)})},K=["light","dark","system"];function G(e){if(e==null||typeof e!="object")return!1;const t=e.__frame_init;return t!=null&&typeof t=="object"}function J(e){return e!=null&&typeof e=="object"&&e.__frame_size_poke===!0}function V(e){if(e==null||typeof e!="object")return!1;const t=e.__frame_theme;if(t==null||typeof t!="object")return!1;const n=t.theme;return typeof n=="string"&&K.includes(n)}function Y(e){try{typeof reportError=="function"?reportError(e):setTimeout(()=>{throw e},0)}catch{}}function z(e){if(window===top||e.type==="auxclick"&&e.button!==1)return;const t=e.composedPath?e.composedPath():[e.target];let n=null;for(let f=0;f<t.length;f++){const a=t[f];if(a&&a.matches&&a.matches("a[href],area[href]")){n=a;break}}if(!n&&e.target&&e.target.closest&&(n=e.target.closest("a[href],area[href]")),!n)return;const u=n.getAttribute("href");if(!u)return;let o,s;try{o=new URL(u,document.baseURI),s=new URL(document.baseURI).origin}catch{return}(o.protocol==="http:"||o.protocol==="https:")&&o.origin!==s&&(e.preventDefault(),parent.postMessage({__frame_nav:!0,url:o.href},"*"))}const D={};function T(e){if(window===top)return;const t=Date.now();t-(D[e]||0)<500||(D[e]=t,parent.postMessage({__frame_engaged:!0,kind:e},"*"))}const Q=2e3,U=["wheel","touchstart","touchmove","keydown","pointerdown"];let B=0;function X(e){e.isTrusted&&(B=Date.now())}function Z(){addEventListener("click",z,!0),addEventListener("auxclick",z,!0)}function ee(){for(let e=0;e<U.length;e++)addEventListener(U[e],X,{capture:!0,passive:!0});addEventListener("scroll",e=>{e.isTrusted&&Date.now()-B<Q&&T("scroll")},{capture:!0,passive:!0}),addEventListener("pointermove",e=>{e.isTrusted&&T("pointer")},{capture:!0,passive:!0}),addEventListener("click",e=>{e.isTrusted&&T("click")},{capture:!0,passive:!0})}function te(e,t,n){const u=[...t.values()].filter(o=>o.targets.some(s=>s.startsWith(e+".")));return{wrap(o,s){const f=`${e}.${o}`,a=u.filter(i=>i.targets.includes(f));return a.length===0?(...i)=>{try{return s(...i)}catch(p){return Promise.reject(p)}}:(...i)=>{let p=i;for(const c of a){const l=c.module.parameters;if(l)try{p=l(p)}catch{return Promise.reject({code:"transform_error",id:c.id,scope:e,message:"parameters transform failed"})}}let h;try{h=s(...p)}catch(c){h=Promise.reject(c)}return h.then(c=>{for(let l=a.length-1;l>=0;l--){const m=a[l],d=m.module.returns;if(d)try{c=d(c)}catch{return n({id:m.id,scope:e,leg:"returns"}),c}}return c},c=>{for(let l=a.length-1;l>=0;l--){const m=a[l],d=m.module.throws;if(d)try{c=d(c)}catch{return n({id:m.id,scope:e,leg:"throws"}),Promise.reject(c)}}return Promise.reject(c)})}}}}function ne(e,t,n,u=()=>{}){const o=new Set(e.changes??[]),s=new Map;for(const f of o){const a=t[f];a&&s.set(f,a)}return{contract:e.contract,changes:o,flags:new Set(e.flags??[]),capabilities:e.capabilities??{},capBudgets:e.capBudgets??{},transforms:s,shellOrigin:n.shellOrigin,mount:n.mount,pipe:f=>te(f,s,u)}}(function(){const e=Object.defineProperty,t=globalThis,n=["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel","RTCIceCandidate","RTCSessionDescription","RTCRtpSender","RTCRtpReceiver"];let u=0;for(let o=0;o<n.length;o++){const s=n[o];try{e(t,s,{value:void 0,writable:!1,configurable:!1})}catch{try{delete t[s]}catch{}try{e(t,s,{value:void 0,writable:!1,configurable:!0})}catch{}}typeof t[s]=="function"&&u++}if(u&&window!==top)try{parent.postMessage({__frame_rtc_lockdown_failed:u},"*")}catch{}})();const re=1e4,oe=Object.freeze([...window.__FRAME_PREAMBLE?.origins??["https://claude.ai","https://preview.claude.ai"]]);function se(e){for(const t of oe)if(t.endsWith(":*"))try{const n=new URL(e);if(`${n.protocol}//${n.hostname}:*`===t)return!0}catch{}else if(e===t)return!0;return!1}const R=Object.freeze({...window.__FRAME_PREAMBLE?.capabilities??{}}),A=window.__FRAME_PREAMBLE?.transforms,k=window.__FRAME_PREAMBLE?.comments,C=/^[\w.-]+\.js$/,ie=/^[a-z][a-z0-9_-]{0,63}$/;let F=null,v=null;function N(e,t,n){try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!1,enumerable:!0})}catch{try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!0,enumerable:!0})}catch{}}}let I=!1;function H(e){const t=document.documentElement;e==="light"||e==="dark"?(t.dataset.theme=e,t.style.colorScheme=e,I=!0):I&&(delete t.dataset.theme,t.style.colorScheme="",I=!1)}const E={mcp:{watchTool:{handlerArg:3}}},P=new Map;function ae(e,t){const n=P.get(e);if(!n)return;Object.assign(n.impl,t),n.impl.__settled=()=>Promise.reject({code:"capability_removed",message:`${e}: method not in this runtime`});const u=n.queue;n.queue=[];for(const o of u){const s=t[o.method];if(s)if(E[e]?.[o.method])try{o.resolve(s(...o.args))}catch{O(o,E[e][o.method].handlerArg,{code:"transform_error",message:`${e}.${o.method} rejected its arguments`})}else s(...o.args).then(o.resolve,o.reject);else{const f={code:"capability_removed",message:`${e}.${o.method} is not in this runtime`},a=E[e]?.[o.method];if(a){O(o,a.handlerArg,f);continue}o.reject(f)}}}function $(e,t){const n=P.get(e);if(!n)return;n.impl.__settled=()=>Promise.reject(t);const u=n.queue;n.queue=[];for(const o of u){const s=E[e]?.[o.method];if(s){O(o,s.handlerArg,t);continue}o.reject(t)}}function O(e,t,n){if(e.syncState?.dead)return;const u=e.args[t];typeof u=="function"&&queueMicrotask(()=>{if(!e.syncState?.dead)try{u({type:"error",error:n})}catch(o){Y(o)}})}const q=Object.getOwnPropertyDescriptor(window,"claude");if(window!==top&&!(q&&q.writable===!1)){Z(),ee();const e=q?.value??{};N(window,"claude",e);const t=i=>{const p={impl:Object.create(null),queue:[]};P.set(i,p);const h=new Proxy(p.impl,{get:(c,l)=>{if(typeof l!="string"||l==="then"||l==="toJSON"||l==="valueOf")return;if(l==="toString")return Object.prototype.toString;const m=E[i]?.[l];return m?(...d)=>{if(typeof d[m.handlerArg]!="function")throw new TypeError(`${i}.${l} requires a handler function`);const g=c[l];if(g)return g(...d);if(c.__settled){const _={dead:!1},S={args:[...d],syncState:_};return c.__settled().catch(j=>O(S,m.handlerArg,j)),()=>{_.dead=!0}}let y=null;const w={dead:!1};return p.queue.push({method:l,args:d,resolve:_=>{y=typeof _=="function"?_:null,w.dead&&y?.()},reject:()=>{},syncState:w}),()=>{w.dead=!0,y?.()}}:(...d)=>{const g=c[l]??c.__settled;return g?g(...d):new Promise((y,w)=>{p.queue.push({method:l,args:d,resolve:y,reject:w})})}},set:()=>!1});N(e,i,h)};for(const i of Object.keys(R)){if(e[i]!==void 0){N(e,i,e[i]);continue}t(i)}let n=null,u=null,o=0;const s=i=>{i.source!==parent||!se(i.origin)||G(i.data)&&(n=i.data.__frame_init,v=i.origin,removeEventListener("message",s),clearTimeout(o),u?.())};addEventListener("message",s),parent.postMessage({__frame_connect:!0},"*");const f=new Promise(i=>{u=i,o=setTimeout(()=>{removeEventListener("message",s),i()},re)}),a=document.readyState==="loading"?new Promise(i=>document.addEventListener("DOMContentLoaded",()=>i(),{once:!0})):Promise.resolve();f.then(async()=>{if(!n||!v){for(const r of P.keys())$(r,{code:"not_granted",message:"frame initialization did not arrive - capability unavailable"});return}H(n.theme);const i=v;let p=!1;addEventListener("message",r=>{if(r.source!==parent||r.origin!==i)return;V(r.data)&&H(r.data.__frame_theme.theme);const b=r.data?.__fc_mode;b&&typeof b=="object"&&!p&&k&&C.test(k)&&(p=!0,h(k).then(L=>L.install?.(i,b.on===!0)).catch(()=>{}))});const h=r=>x(()=>import("/_runtime/"+r),void 0),c=Object.keys(n.capabilities??{});for(const r of c)Object.hasOwn(R,r)||ie.test(r)&&e[r]===void 0&&(t(r),$(r,{code:"capability_disabled",message:"capability not in this runtime generation"}));const l=c.filter(r=>Object.hasOwn(R,r)).map(r=>[r,R[r]]).filter(r=>typeof r[1]=="string"&&C.test(r[1])),[m,...d]=await Promise.allSettled([A&&C.test(A)?h(A):Promise.resolve({}),...l.map(([,r])=>h(r))]),g=v;F=ne(n,m.status==="fulfilled"&&m.value?.TRANSFORMS||{},{shellOrigin:g,mount:ae},r=>parent.postMessage({__frame_cap_telemetry:r},g));const y=r=>parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:r}},g),w=F;d.forEach((r,b)=>{const L=l[b][0];if(r.status!=="fulfilled"){y(L);return}try{r.value?.install?.(w)}catch{y(L)}});for(const[r,b]of P)b.queue.length===0&&Object.keys(b.impl).length>0||$(r,{code:c.includes(r)?"capability_disabled":"not_granted",message:"capability not available in this session"});await a,parent.postMessage({__frame_ready:!0},v);let _=-1,S=0;const j=()=>{S=0;const r=Math.max(document.documentElement.scrollHeight,document.body?document.body.scrollHeight:0);r!==_&&(_=r,parent.postMessage({__frame_size:!0,h:r},g))},M=()=>{S||(S=setTimeout(j,200))},W=new ResizeObserver(M);W.observe(document.documentElement),document.body&&W.observe(document.body),document.addEventListener("load",M,!0),document.fonts?.ready.then(M,()=>{}),addEventListener("beforeprint",()=>{_=-1,j()}),M(),addEventListener("message",r=>{r.source!==parent||r.origin!==g||J(r.data)&&(_=-1,M())})})}})();</script><!-- /frame-runtime --><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>성장 리포트 목업 · 김서준</title>
+<style>
+  :root {
+    --paper:#EEF1EC; --surface:#FCFDFB; --ink:#182422; --muted:#5E6E68;
+    --faint:#8A968F; --line:#E2E8DF; --line-strong:#CBD5C7;
+    --growth:#1F6E4F; --growth-ink:#175A40; --growth-soft:#E5EFE9;
+    --process:#B4711F; --process-ink:#8F5915; --process-soft:#F4ECDD;
+    --shadow:0 1px 2px rgba(24,36,34,.05), 0 18px 44px -20px rgba(24,36,34,.22);
+    --font-sans:'Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',system-ui,sans-serif;
+    --font-fig:'Iowan Old Style','Palatino Linotype',Georgia,'Times New Roman',serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:#0E1514; --surface:#161F1D; --ink:#EAF0EC; --muted:#9EABA4;
+      --faint:#76837C; --line:#243130; --line-strong:#33423E;
+      --growth:#54BE8E; --growth-ink:#7BD0A9; --growth-soft:#152420;
+      --process:#DBA55E; --process-ink:#E7BC82; --process-soft:#241B10;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 20px 50px -22px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper:#EEF1EC; --surface:#FCFDFB; --ink:#182422; --muted:#5E6E68;
+    --faint:#8A968F; --line:#E2E8DF; --line-strong:#CBD5C7;
+    --growth:#1F6E4F; --growth-ink:#175A40; --growth-soft:#E5EFE9;
+    --process:#B4711F; --process-ink:#8F5915; --process-soft:#F4ECDD;
+    --shadow:0 1px 2px rgba(24,36,34,.05), 0 18px 44px -20px rgba(24,36,34,.22);
+  }
+  :root[data-theme="dark"] {
+    --paper:#0E1514; --surface:#161F1D; --ink:#EAF0EC; --muted:#9EABA4;
+    --faint:#76837C; --line:#243130; --line-strong:#33423E;
+    --growth:#54BE8E; --growth-ink:#7BD0A9; --growth-soft:#152420;
+    --process:#DBA55E; --process-ink:#E7BC82; --process-soft:#241B10;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 20px 50px -22px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; }
+  .stage {
+    background:var(--paper); color:var(--ink); font-family:var(--font-sans);
+    min-height:100vh; padding:40px 20px 64px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; letter-spacing:-.006em;
+  }
+
+  .toolbar { max-width:840px; margin:0 auto 18px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .toolbar .kicker { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .themebtn {
+    font:inherit; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer;
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:999px;
+    padding:6px 14px; letter-spacing:.02em;
+  }
+  .themebtn:hover { color:var(--ink); border-color:var(--growth); }
+  .themebtn:focus-visible { outline:2px solid var(--growth); outline-offset:2px; }
+
+  .sheet {
+    max-width:840px; margin:0 auto; background:var(--surface);
+    border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  /* Masthead */
+  .masthead { display:flex; justify-content:space-between; align-items:flex-start;
+    gap:20px; padding:26px 34px 22px; border-bottom:2px solid var(--ink); }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .mark { width:34px; height:34px; border-radius:8px; background:var(--growth);
+    display:grid; place-items:center; color:#fff; font-family:var(--font-fig);
+    font-size:20px; font-weight:700; flex:none; }
+  :root[data-theme="dark"] .mark, .mark { color:#06120D; }
+  .brand .name { font-weight:700; font-size:15px; letter-spacing:-.01em; }
+  .brand .sub { font-size:11px; color:var(--faint); letter-spacing:.02em; margin-top:1px; }
+  .doctitle { text-align:right; }
+  .doctitle .t { font-size:13px; font-weight:700; letter-spacing:.02em; }
+  .doctitle .m { font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; margin-top:3px; }
+  .pill { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.03em;
+    color:var(--growth-ink); background:var(--growth-soft); border-radius:999px;
+    padding:2px 9px; margin-top:7px; }
+
+  /* Student strip */
+  .student { padding:18px 34px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); }
+  .student .who { font-size:24px; font-weight:700; letter-spacing:-.02em; }
+  .student .grade { font-size:13px; color:var(--muted); }
+  .student .period { margin-left:auto; font-size:12px; color:var(--muted);
+    font-variant-numeric:tabular-nums; }
+
+  /* Hero summary */
+  .hero { padding:22px 34px; background:linear-gradient(180deg,var(--growth-soft),transparent);
+    border-bottom:1px solid var(--line); }
+  .hero .lbl { font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--growth-ink); font-weight:700; margin-bottom:7px; }
+  .hero p { margin:0; font-size:18px; line-height:1.62; letter-spacing:-.015em; text-wrap:balance; }
+  .hero b { color:var(--growth-ink); font-weight:700; }
+  .hero .b2 { color:var(--process-ink); }
+
+  /* Axes */
+  .axes { display:grid; grid-template-columns:1fr 1fr; }
+  .axis { padding:24px 34px 26px; }
+  .axis.growth { border-right:1px solid var(--line); }
+  .eyebrow { display:flex; align-items:center; gap:9px; margin-bottom:18px; }
+  .eyebrow .en { font-size:11px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; }
+  .eyebrow .ko { font-size:12px; color:var(--muted); font-weight:600; }
+  .eyebrow .role { margin-left:auto; font-size:10.5px; color:var(--faint); }
+  .axis.growth .en { color:var(--growth); }
+  .axis.process .en { color:var(--process); }
+  .tick { width:7px; height:16px; border-radius:2px; }
+  .axis.growth .tick { background:var(--growth); }
+  .axis.process .tick { background:var(--process); }
+
+  /* Level badge */
+  .level { display:flex; align-items:center; gap:14px; padding:14px 16px; margin-bottom:18px;
+    background:var(--growth-soft); border-radius:8px; }
+  .level .lv { font-family:var(--font-fig); font-size:38px; font-weight:700; line-height:1;
+    color:var(--growth-ink); font-variant-numeric:tabular-nums; }
+  .level .meta .cefr { font-size:13px; font-weight:700; }
+  .level .meta .grp { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .level .steps { margin-left:auto; display:flex; gap:3px; align-items:flex-end; height:34px; }
+  .level .steps i { width:8px; border-radius:2px; background:var(--line-strong); }
+  .level .steps i.on { background:var(--growth); }
+
+  /* Metric rows */
+  .metric { display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line); }
+  .metric:first-of-type { border-top:none; }
+  .metric .k { font-size:13px; color:var(--muted); width:78px; flex:none; }
+  .metric .flow { display:flex; align-items:baseline; gap:8px; font-family:var(--font-fig);
+    font-variant-numeric:tabular-nums; }
+  .metric .from { color:var(--faint); font-size:15px; }
+  .metric .arw { color:var(--faint); font-size:12px; }
+  .metric .to { font-size:22px; font-weight:700; }
+  .metric .unit { font-family:var(--font-sans); font-size:11px; color:var(--muted); margin-left:1px; }
+  .delta { margin-left:auto; font-size:12px; font-weight:700; padding:3px 8px; border-radius:6px;
+    font-variant-numeric:tabular-nums; }
+  .delta.up { color:var(--growth-ink); background:var(--growth-soft); }
+  .delta.flat { color:var(--muted); background:var(--line); }
+
+  /* WPM chart */
+  .chart { margin-top:18px; }
+  .chart .cap { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
+  .chart .cap .l { font-size:11.5px; font-weight:600; color:var(--muted); }
+  .chart .cap .r { font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .chart svg { width:100%; height:auto; display:block; }
+
+  /* Process groups */
+  .pgroup { margin-bottom:16px; }
+  .pgroup h4 { margin:0 0 4px; font-size:12px; font-weight:700; letter-spacing:.01em; }
+  .pgroup h4 span { color:var(--faint); font-weight:500; }
+  .prow { display:flex; align-items:baseline; gap:10px; padding:9px 0; border-top:1px solid var(--line); }
+  .prow:first-of-type { border-top:none; }
+  .prow .k { font-size:12.5px; color:var(--muted); }
+  .prow .v { margin-left:auto; font-family:var(--font-fig); font-variant-numeric:tabular-nums;
+    font-size:17px; font-weight:700; }
+  .prow .v small { font-family:var(--font-sans); font-size:11px; font-weight:500; color:var(--muted); }
+  .bar { height:5px; border-radius:3px; background:var(--line); margin-top:8px; overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:3px; background:var(--process); }
+  .soon { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--faint);
+    border:1px dashed var(--line-strong); border-radius:6px; padding:4px 9px; margin:5px 6px 0 0; }
+  .soon::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--faint); }
+
+  /* Tags */
+  .tags { padding:22px 34px; border-top:1px solid var(--line); display:grid;
+    grid-template-columns:1fr 1fr; gap:22px; }
+  .tags h4 { margin:0 0 10px; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); }
+  .chip { display:inline-block; font-size:13px; font-weight:600; padding:6px 12px; border-radius:7px;
+    margin:0 6px 6px 0; }
+  .chip.pos { color:var(--growth-ink); background:var(--growth-soft); }
+  .chip.imp { color:var(--process-ink); background:var(--process-soft); }
+  .tags .note { display:block; font-size:11.5px; color:var(--muted); margin-top:4px; }
+
+  /* Comment */
+  .comment { padding:24px 34px; border-top:1px solid var(--line); background:var(--growth-soft); }
+  .comment .lbl { font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700;
+    color:var(--growth-ink); margin-bottom:10px; }
+  .comment p { margin:0; font-size:15px; line-height:1.75; letter-spacing:-.01em; }
+  .comment .sign { margin-top:14px; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+  .comment .sign b { color:var(--ink); font-weight:700; }
+  .verified { display:inline-flex; align-items:center; gap:5px; color:var(--growth-ink); font-weight:700; }
+  .verified svg { width:13px; height:13px; }
+
+  /* Footer */
+  .foot { padding:16px 34px; border-top:1px solid var(--line); display:flex; gap:10px;
+    align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  .foot .trust { font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:7px; }
+  .foot .trust svg { width:14px; height:14px; color:var(--growth); flex:none; }
+  .foot .by { font-size:11px; color:var(--faint); letter-spacing:.02em; }
+
+  @media (max-width:640px) {
+    .axes { grid-template-columns:1fr; }
+    .axis.growth { border-right:none; border-bottom:1px solid var(--line); }
+    .tags { grid-template-columns:1fr; }
+    .masthead, .student, .hero, .axis, .tags, .comment, .foot { padding-left:22px; padding-right:22px; }
+    .student .period { margin-left:0; width:100%; }
+  }
+  @media print {
+    .toolbar { display:none; }
+    .stage { padding:0; background:#fff; }
+    .sheet { box-shadow:none; border:none; max-width:none; }
+  }
+</style>
+
+<div class="stage">
+  <div class="toolbar">
+    <span class="kicker">Picklass · 성장 리포트 목업 (P0-2)</span>
+    <button class="themebtn" id="themebtn" type="button" aria-label="라이트·다크 전환">◐ 테마</button>
+  </div>
+
+  <article class="sheet" aria-label="김서준 성장 리포트">
+    <!-- Masthead : 기관 브랜딩(§7.10) placeholder -->
+    <header class="masthead">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">G</div>
+        <div>
+          <div class="name">그로우 영어학원</div>
+          <div class="sub">GROW ENGLISH · 기관 브랜딩 영역</div>
+        </div>
+      </div>
+      <div class="doctitle">
+        <div class="t">성장 리포트</div>
+        <div class="m">2026.03.01 – 06.30</div>
+        <span class="pill">2회차 · 정기</span>
+      </div>
+    </header>
+
+    <!-- Student -->
+    <div class="student">
+      <span class="who">김서준</span>
+      <span class="grade">초등 4학년 · Reading</span>
+      <span class="period">발행일 2026.07.01</span>
+    </div>
+
+    <!-- Hero one-line summary : 성장1 + 과정1 -->
+    <section class="hero">
+      <div class="lbl">한 줄 요약</div>
+      <p>서준이는 이번 기간 읽기 속도가 <b>82 → 118 WPM (+44%)</b>로 크게 늘었고,
+         <span class="b2"><b class="b2">출석 95% · 완주 93%</b></span>로 꾸준하고 성실하게 학습했습니다.</p>
+    </section>
+
+    <!-- Two axes -->
+    <div class="axes">
+      <!-- GROWTH : 증명 -->
+      <section class="axis growth">
+        <div class="eyebrow">
+          <span class="tick" aria-hidden="true"></span>
+          <span class="en">Growth</span><span class="ko">성장</span>
+          <span class="role">얼마나 컸나 — 증명</span>
+        </div>
+
+        <div class="level">
+          <div class="lv">8</div>
+          <div class="meta">
+            <div class="cefr">Lv.8 · CEFR A2</div>
+            <div class="grp">6단계 그룹 중 3그룹 (중위권 진입)</div>
+          </div>
+          <div class="steps" aria-hidden="true">
+            <i class="on" style="height:12px"></i><i class="on" style="height:17px"></i>
+            <i class="on" style="height:22px"></i><i style="height:26px"></i>
+            <i style="height:30px"></i><i style="height:34px"></i>
+          </div>
+        </div>
+
+        <div class="metric">
+          <span class="k">읽기 속도</span>
+          <span class="flow"><span class="from">82</span><span class="arw">→</span>
+            <span class="to">118</span><span class="unit">WPM</span></span>
+          <span class="delta up">+44%</span>
+        </div>
+        <div class="metric">
+          <span class="k">정확도</span>
+          <span class="flow"><span class="from">71%</span><span class="arw">→</span>
+            <span class="to">86%</span></span>
+          <span class="delta up">+15%p</span>
+        </div>
+        <div class="metric">
+          <span class="k">레벨</span>
+          <span class="flow"><span class="from">Lv.6</span><span class="arw">→</span>
+            <span class="to">Lv.8</span></span>
+          <span class="delta up">+2단계</span>
+        </div>
+
+        <div class="chart">
+          <div class="cap"><span class="l">읽기 속도(WPM) 추이</span>
+            <span class="r">주간 평균 · 16주</span></div>
+          <svg viewBox="0 0 320 118" role="img" aria-label="WPM 추이: 82에서 118로 상승">
+            <line x1="12" y1="24" x2="308" y2="24" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="12" y1="56" x2="308" y2="56" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="12" y1="88" x2="308" y2="88" stroke="var(--line)" stroke-width="1"></line>
+            <path d="M12,96 L54,84 L97,78 L139,66 L181,56 L223,44 L266,34 L308,24 L308,110 L12,110 Z" fill="var(--growth-soft)"></path>
+            <polyline points="12,96 54,84 97,78 139,66 181,56 223,44 266,34 308,24" fill="none" stroke="var(--growth)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"></polyline>
+            <circle cx="12" cy="96" r="2.6" fill="var(--surface)" stroke="var(--growth)" stroke-width="2"></circle>
+            <circle cx="308" cy="24" r="4.2" fill="var(--growth)"></circle>
+            <text x="12" y="112" font-size="9" fill="var(--faint)" font-family="var(--font-fig)">82</text>
+            <text x="300" y="18" font-size="9" fill="var(--growth-ink)" font-family="var(--font-fig)" font-weight="700">118</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- PROCESS : 근거 -->
+      <section class="axis process">
+        <div class="eyebrow">
+          <span class="tick" aria-hidden="true"></span>
+          <span class="en">Process</span><span class="ko">과정</span>
+          <span class="role">제대로·꾸준히 — 근거</span>
+        </div>
+
+        <div class="pgroup">
+          <h4>성실도 <span>· 얼마나 꾸준히</span></h4>
+          <div class="prow"><span class="k">출석률</span>
+            <span class="v">95%<small> · 19/20회</small></span></div>
+          <div class="bar"><i style="width:95%"></i></div>
+          <div class="prow"><span class="k">완주율</span>
+            <span class="v">93%<small> · 37/40 모듈</small></span></div>
+          <div class="bar"><i style="width:93%"></i></div>
+          <div class="prow"><span class="k">학습량</span>
+            <span class="v">14h<small> · 37세션</small></span></div>
+        </div>
+
+        <div class="pgroup">
+          <h4>이해도 <span>· 얼마나 제대로</span></h4>
+          <div class="prow"><span class="k">평균 정확도</span>
+            <span class="v">86%</span></div>
+          <div class="bar"><i style="width:86%"></i></div>
+          <div style="margin-top:10px">
+            <span class="soon">평균 시도 횟수 · 데이터 축적 중</span>
+            <span class="soon">성실 학습 지수 · 데이터 축적 중</span>
+          </div>
+          <p style="font-size:11px;color:var(--faint);margin:9px 0 0;line-height:1.55">
+            문항별 시도·오답 패턴 지표는 다음 리포트부터 제공됩니다 (P1-2 과정 데이터 연동).</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tags -->
+    <section class="tags">
+      <div>
+        <h4>강점</h4>
+        <span class="chip pos">어휘력</span>
+        <span class="chip pos">사실확인 독해</span>
+        <span class="note">진단·수업 정답 패턴에서 안정적으로 확인됨.</span>
+      </div>
+      <div>
+        <h4>보완점</h4>
+        <span class="chip imp">추론형 문항</span>
+        <span class="note">다음 달 수업에서 집중 보강할 예정입니다.</span>
+      </div>
+    </section>
+
+    <!-- Teacher comment -->
+    <section class="comment">
+      <div class="lbl">선생님 코멘트</div>
+      <p>이번 학기 서준이는 어휘가 눈에 띄게 늘면서 지문을 읽고 이해하는 속도가 빨라졌습니다.
+         특히 사실을 확인하는 문항에서 정확도가 크게 올랐어요. 앞으로 글의 숨은 의미를 유추하는
+         추론형 문항을 함께 연습하면 다음 단계로 무리 없이 올라갈 수 있습니다.</p>
+      <div class="sign">
+        <span>담당 · <b>이수진 선생님</b></span> ·
+        <span class="verified">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+          원장 검수·승인 완료
+        </span>
+      </div>
+    </section>
+
+    <!-- Footer trust -->
+    <footer class="foot">
+      <span class="trust">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        모든 수치는 학생의 실제 학습 기록에 근거합니다 · 추정·과장 없음
+      </span>
+      <span class="by">Powered by Picklass</span>
+    </footer>
+  </article>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themebtn');
+    btn.addEventListener('click', function () {
+      var root = document.documentElement;
+      var cur = root.getAttribute('data-theme');
+      if (!cur) {
+        cur = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
+
+</body></html>

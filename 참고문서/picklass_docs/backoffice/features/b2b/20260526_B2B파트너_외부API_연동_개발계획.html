@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B2B 파트너 외부 API 연동 개발계획 — picklass</title>
+<style>
+/* ─────────────────────────────────────────────
+   picklass 개발 문서 — studio.picklass.com CI 톤앤매너
+   교육용 민트 그린 + slate 중립 · Pretendard / 단일 파일 자기완결
+   ───────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+:root {
+  --ink: #0f172a;          /* slate-900 — 제목 */
+  --ink-soft: #334155;     /* slate-700 — 본문 */
+  --muted: #64748b;        /* slate-500 — 보조 */
+  --line: #e2e8f0;         /* slate-200 — 구분선 */
+  --line-strong: #cbd5e1;  /* slate-300 */
+  --accent: #4a9278;       /* 교육용 민트 그린 600 — 브랜드 */
+  --accent-strong: #3b7561;/* 민트 700 — hover */
+  --accent-soft: #f0f9f6;  /* 민트 50 — soft 배경 */
+  --accent-border: #b8e4d3;/* 민트 200 — 테두리 */
+  --bg-page: #f1f5f9;      /* slate-100 */
+  --bg-card: #ffffff;
+  --code-bg: #f1f5f9;      /* slate-100 — 인라인 코드 */
+  --pre-bg: #0f172a;       /* slate-900 — 코드 블록 */
+  --pre-ink: #e2e8f0;      /* slate-200 */
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg-page);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  width: min(92%, 1100px);
+  margin: 3.5rem auto;
+  padding: clamp(2rem, 4.5vw, 3.5rem) clamp(1.6rem, 4.5vw, 3.5rem) clamp(2.5rem, 5vw, 4rem);
+  background: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(20, 23, 40, .04), 0 18px 50px -28px rgba(20, 23, 40, .28);
+  line-height: 1.78;
+  color: var(--ink-soft);
+  font-size: 16.5px;
+  letter-spacing: -0.003em;
+}
+
+/* 상단 내비게이션 */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin: 0 0 2.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.topnav .brand {
+  margin-right: auto;
+  padding: 0.3rem 0.2rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.topnav .brand:hover { background: transparent; color: var(--accent-strong); }
+.topnav a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  border-bottom: none;
+  transition: background .15s ease, color .15s ease;
+}
+.topnav a:hover { background: #f2f4f8; color: var(--ink); }
+.topnav a.active { background: var(--accent-soft); color: var(--accent); }
+
+/* 제목 */
+h1 {
+  font-size: 1.95rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--ink);
+  margin: 0 0 1.1rem;
+  letter-spacing: -0.02em;
+}
+h1::after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 3px;
+  margin-top: 1rem;
+  background: var(--accent);
+  border-radius: 3px;
+}
+h2 {
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 3rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+  letter-spacing: -0.015em;
+}
+h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2rem 0 0.6rem;
+  letter-spacing: -0.01em;
+}
+h4 {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 1.3rem 0 0.4rem;
+}
+
+p { margin: 0.7rem 0; }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s ease;
+}
+a:hover { border-bottom-color: var(--accent); }
+
+.meta, p.meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+ul, ol { padding-left: 1.3rem; margin: 0.7rem 0; }
+li { margin: 0.3rem 0; }
+li::marker { color: var(--muted); }
+
+strong, b { color: var(--ink); font-weight: 700; }
+
+blockquote {
+  margin: 0.9rem 0;
+  padding: 0.2rem 0 0.2rem 1.1rem;
+  border-left: 3px solid var(--accent-border);
+  color: var(--ink-soft);
+}
+blockquote p { margin: 0.4rem 0; }
+
+/* 인라인 코드 */
+code {
+  font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  background: var(--code-bg);
+  color: #3b7561;
+  padding: 0.12rem 0.4rem;
+  border-radius: 5px;
+  font-size: 0.86em;
+}
+
+/* 코드 블록 */
+pre {
+  background: var(--pre-bg);
+  color: var(--pre-ink);
+  padding: 1.1rem 1.3rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  margin: 0.8rem 0 1.4rem;
+  box-shadow: 0 10px 30px -20px rgba(20, 23, 40, .5);
+}
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* 표 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.9rem 0 1.5rem;
+  font-size: 0.93rem;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.62rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  color: var(--ink);
+  font-weight: 700;
+  border-bottom: 2px solid var(--line-strong);
+  background: transparent;
+}
+tbody tr:hover { background: #f6fbf9; }
+td s { color: var(--muted); }
+td pre { margin: 0.3rem 0; }
+.center { text-align: center; }
+
+/* key-value 리스트 */
+.kvlist {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0 1.4rem;
+  border-top: 1px solid var(--line);
+}
+.kvlist > li {
+  padding: 0.55rem 0;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.kvlist > li > b {
+  min-width: 104px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* 목차 */
+.toc {
+  background: #f6fbf9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.5rem;
+  margin: 1.6rem 0 2.4rem;
+  font-size: 0.93rem;
+}
+.toc h2 {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.toc ol { margin: 0; padding-left: 1.2rem; }
+.toc li { margin: 0.25rem 0; }
+.toc a { color: var(--ink-soft); }
+.toc a:hover { color: var(--accent); border-bottom-color: transparent; }
+
+/* 콜아웃 */
+.callout {
+  margin: 1.3rem 0;
+  padding: 1rem 1.3rem;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+}
+.callout > h4 { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
+.callout.note {
+  background: #fffaf0;
+  border-color: #f3e4bf;
+  border-left-color: #e0a020;
+}
+.callout.note > h4 { color: #a9750a; }
+.callout.warn {
+  background: #fef5f4;
+  border-color: #f4d6d3;
+  border-left-color: #d6453c;
+}
+.callout.warn > h4 { color: #b5362d; }
+
+/* 태그 / 배지 */
+.tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.14rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+.tag.done { background: #e3f6e8; color: #1f7a3d; }
+.tag.wip { background: #fff3d6; color: #9a6a00; }
+.tag.future, .tag.default { background: #eef1f5; color: #4a5360; }
+.tag.dir { background: #eef1f5; color: #4a5360; }
+
+/* 푸터 */
+footer {
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  body { width: 100%; margin: 0; border-radius: 0; box-shadow: none; font-size: 16px; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.18rem; }
+  .kvlist > li > b { min-width: 0; }
+  pre { font-size: 0.76rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="https://www.picklass.com/" target="_blank" rel="noopener">picklass</a>
+  <a href="#top" class="active">개발계획</a>
+  <a href="#sec-flow">시스템 흐름</a>
+  <a href="#sec-spec">API 스펙</a>
+</nav>
+
+<h1 id="top">B2B 파트너 외부 API 연동 개발계획</h1>
+<p class="meta">
+  픽클래스와 파트너 시스템 간 <b>3개 연동 지점</b>(로그인 화면 제공 · 수강목록 조회 · 학습결과 조회)의 API 계약 설계.
+  픽클래스는 파트너의 회원정보·수강내역을 소유하지 않고 <b>API 호출 로그만</b> 기록합니다.
+</p>
+
+<ul class="kvlist">
+  <li><b>작성일</b> 2026-05-26</li>
+  <li><b>최종 수정</b> 2026-06-17</li>
+</ul>
+
+<nav class="toc">
+  <h2>목차</h2>
+  <ol>
+    <li><a href="#sec-flow">시스템 흐름</a></li>
+    <li><a href="#sec-spec">파트너 API 표준 스펙</a></li>
+  </ol>
+</nav>
+
+<!-- ───────────────────────── 1. 시스템 흐름 ───────────────────────── -->
+<h2 id="sec-flow">1. 시스템 흐름</h2>
+
+<h3>1-1. B2B 로그인 흐름 <span class="tag dir">로그인 화면 제공: 파트너 → 픽클래스</span></h3>
+<p>파트너가 로그인 화면을 제공하고, 픽클래스는 그 화면으로 학습자를 redirect한다. <b>픽클래스는 비밀번호를 수신하지 않는다.</b></p>
+<pre><code>학습자: GET /auth/b2b/login?institutionCode=xxx
+          ↓
+tutoring:
+  ① institutionCode → institution_id 해석
+  ② 파트너 login_page_url 확인
+  ③ state nonce 생성 → 단기 캐시 저장 (5분 TTL)
+  ④ {login_page_url}?callback={callback_url}&amp;institutionId={id}&amp;state={nonce} 로 redirect
+
+파트너 로그인 페이지 (파트너 제공):
+  학습자 ID/PW 입력 → 파트너 자체 인증 처리 (픽클래스는 PW 알 수 없음)
+  인증 성공 → auth_secret으로 HS256 JWT 서명 (exp: 5분)
+  → GET {callback_url}?token={signed_jwt}&amp;state={nonce} redirect
+          ↓
+tutoring callback (/auth/b2b/callback):
+  ⑤ state 검증 (캐시 nonce 비교 후 소비, 불일치/재사용 시 400)
+  ⑥ alg(HS256 고정)·서명(auth_secret) 검증
+  ⑦ 시각(exp 만료·iat leeway)·jti(replay)·iss·institutionId 검증
+  ⑧ 인증 검증 결과 로그 기록 (토큰·시크릿 마스킹)
+  ⑨ 픽클래스 JWT 발급 (payload: institutionId, user_pk_id, userId, level, loginScope='institution')
+  ⑩ 픽클래스 학습 화면으로 redirect</code></pre>
+
+<h3>1-2. B2B 수강목록 조회 흐름 <span class="tag dir">수강목록: 파트너 → 픽클래스</span></h3>
+<p>수강중·수강완료 강좌를 <b>하나의 파트너 API</b>로 실시간 조회한다.</p>
+<pre><code>학습자: GET /lessons/enrolled-courses
+  header: JWT (institutionId, user_pk_id 포함)
+          ↓
+tutoring:
+  ① 로컬 DB: INTERNAL 수강 목록 조회 (기존 쿼리 유지)
+  ② loginScope = 'institution'이면:
+       파트너 enrollment_endpoint 확인
+       파트너 수강목록 API 호출 (수강중 + 수강완료 통합):
+         GET {enrollment_endpoint}?user_pk_id={user_pk_id}
+                ↓
+       파트너 응답: { active: [{ course_id, completion_rate, ... }], completed: [...] }  ← 픽클래스는 소유하지 않음
+                ↓
+       호출 결과 로그 기록
+       응답에서 픽클래스 courseId를 매핑하여 과정 정보 조회
+  ③ INTERNAL + B2B(파트너 API 실시간 조회) 병합하여 반환</code></pre>
+
+<!-- ───────────────────────── 2. API 스펙 ───────────────────────── -->
+<h2 id="sec-spec">2. 파트너 API 표준 스펙</h2>
+<p>B2B 연동에 필요한 API 규격서. 제공 방향에 따라 구현 주체가 다르다.</p>
+<table>
+  <thead><tr><th>섹션</th><th>제공 방향</th><th>구현 주체</th></tr></thead>
+  <tbody>
+    <tr><td>§2-1 로그인 화면 제공</td><td>파트너 → 픽클래스</td><td><b>파트너</b>가 구현 (로그인 페이지 + 서명 토큰 callback)</td></tr>
+    <tr><td>§2-2 수강목록 API (수강중·수강완료)</td><td>파트너 → 픽클래스</td><td><b>파트너</b>가 구현</td></tr>
+    <tr><td>§2-3 학습 결과 조회 API</td><td>픽클래스 → 파트너</td><td><b>픽클래스</b>가 구현</td></tr>
+  </tbody>
+</table>
+
+<h3>2-1. 로그인 화면 제공</h3>
+<p><b>파트너 → 픽클래스</b> (redirect 방식)</p>
+<p>파트너가 로그인 페이지를 제공한다. 픽클래스가 그 페이지로 학습자를 redirect하고, 파트너가 자체 로그인을 처리한 후 서명된 토큰을 callback으로 전달한다. <b>픽클래스는 비밀번호를 수신하지 않는다.</b></p>
+
+<h4>Step 1 — 파트너 로그인 페이지 진입</h4>
+<pre><code>GET {login_page_url}?callback={picklass_callback_url}&amp;institutionId={institution_uuid}&amp;state={nonce}</code></pre>
+<table>
+  <thead><tr><th>파라미터</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>callback</code></td><td>픽클래스 callback URL (예: <code>https://api.tutoring.picklass.com/auth/b2b/callback</code>)</td></tr>
+    <tr><td><code>institutionId</code></td><td>픽클래스 기관 UUID</td></tr>
+    <tr><td><code>state</code></td><td>CSRF 방지용 nonce — 픽클래스가 생성, 단기 캐시에 5분 저장</td></tr>
+  </tbody>
+</table>
+<blockquote><p>파트너는 이 URL에 GET 요청이 들어오면 자체 로그인 폼을 표시한다.<br>
+학습자 인증 실패 시 파트너는 callback 호출 없이 자체 오류 페이지를 표시한다.</p></blockquote>
+
+<h4>Step 2 — 인증 완료 후 callback redirect</h4>
+<p>학습자 인증 성공 시 파트너가 픽클래스 callback URL로 redirect한다.</p>
+<pre><code>GET {picklass_callback_url}?token={signed_jwt}&amp;state={nonce}</code></pre>
+<!--<p><b>JWT 헤더</b> — 알고리즘은 <code>HS256</code> 고정:</p>
+<pre><code>{ "alg": "HS256", "typ": "JWT" }</code></pre>-->
+<p><b>signed JWT payload</b> (파트너가 <code>auth_secret</code>으로 HS256 서명):</p>
+<pre><code>{
+  "iss": "partner-inst-001",              // 발급 파트너 식별자 (연동 설정과 대조)
+  "institutionId": "inst-uuid-001",       // 픽클래스 기관 UUID (echo-back)
+  "user_pk_id": "partner-internal-pk-001",
+  "userId": "partner_user_001",
+  "level": "B5(CEFR)",                      // 사용자 레벨 (로그인 후 학습 화면 표시용, 없으면 null)
+  "jti": "0190e8c2-8f3a-7c41-b0a2-uuidv7", // 토큰 고유 ID (UUID v7, 1회성·replay 방지)
+  "iat": 1716883200,                       // 발급 시각 (epoch sec)
+  "exp": 1716883500                        // 만료 시각 — 발급 후 5분 이내
+}</code></pre>
+<table>
+  <thead><tr><th>필드</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>iss</code></td><td>발급 파트너 식별자 — 연동 설정의 등록 파트너와 대조</td></tr>
+    <tr><td><code>institutionId</code></td><td>픽클래스 기관 UUID (echo-back)</td></tr>
+    <tr><td><code>user_pk_id</code></td><td>파트너 시스템의 사용자 PK</td></tr>
+    <tr><td><code>userId</code></td><td>파트너 시스템의 사용자 로그인 ID</td></tr>
+    <tr><td><code>level</code></td><td>사용자 레벨 — 로그인 후 학습 화면 표시용 (예: <code>LEVEL 5</code>). 파트너가 레벨 체계를 운용하지 않으면 <code>null</code></td></tr>
+    <tr><td><code>jti</code></td><td>토큰 고유 ID (UUID v7) — exp 윈도우 내 재사용 거부 (replay 방지)</td></tr>
+    <tr><td><code>iat</code></td><td>발급 시각 (epoch sec) — 시계 오차 leeway 내 검증</td></tr>
+    <tr><td><code>exp</code></td><td>만료 시각 — <b>발급 후 5분 이내</b> 필수</td></tr>
+  </tbody>
+</table>
+<!--<blockquote><p>서명 알고리즘: <b>HS256 고정</b>(검증 시 alg 화이트리스트로 핀 고정). <code>auth_secret</code>은 파트너 연동 설정에 사전 공유·저장된 shared secret. 상세 규약은 아래 <b>JWT·시크릿 운영 방식</b> 참조.</p></blockquote>-->
+
+<p><b>오류 코드 규격</b> (픽클래스 callback 기준):</p>
+<table>
+  <thead><tr><th>code</th><th>HTTP</th><th>의미 / 처리</th></tr></thead>
+  <tbody>
+    <tr><td><code>STATE_INVALID</code></td><td>400</td><td>state 불일치·재사용 — CSRF·replay 의심, 로그 기록 후 거부</td></tr>
+    <!--<tr><td><code>TOKEN_ALG_INVALID</code></td><td>401</td><td>alg가 HS256 아님 — 알고리즘 혼동 공격 차단</td></tr>-->
+    <tr><td><code>TOKEN_SIGNATURE_INVALID</code></td><td>401</td><td>auth_secret 불일치 — 서명 검증 실패</td></tr>
+    <tr><td><code>TOKEN_EXPIRED</code></td><td>401</td><td>exp 만료 — 재로그인 유도</td></tr>
+    <tr><td><code>TOKEN_TIMESTAMP_OUT_OF_WINDOW</code></td><td>401</td><td>iat가 허용 시계오차(leeway) 밖 — 미래 발급 토큰 거절</td></tr>
+    <tr><td><code>TOKEN_REPLAYED</code></td><td>401</td><td>exp 윈도우 내 동일 jti 재사용 — replay 차단</td></tr>
+    <tr><td><code>INSTITUTION_MISMATCH</code></td><td>400</td><td>iss·institutionId 불일치 — 위변조 의심</td></tr>
+    <tr><td><code>INSTITUTION_NOT_REGISTERED</code></td><td>404</td><td>등록되지 않은 institutionId / 연동 설정 없음</td></tr>
+  </tbody>
+</table>
+
+
+<h3>2-2. 수강목록 API (수강중 · 수강완료 강좌)</h3>
+<p><b>파트너 → 픽클래스</b></p>
+<p>수강/학습내역 화면 진입 시 호출한다. <b>수강중(<code>active</code>) · 수강완료(<code>completed</code>) · 만료(<code>expired</code>)</b> 강좌를 <b>상태별 배열</b>로 묶어 반환한다. 각 배열 항목은 수강 내역 화면의 과정 카드 한 장에 대응한다.</p>
+<pre><code>GET {partner_enrollment_endpoint}?user_pk_id={user_pk_id}
+X-API-Key: {api_key}   ← 파트너가 요구하는 경우만</code></pre>
+<p><b>Query Parameters</b>:</p>
+<table>
+  <thead><tr><th>파라미터</th><th>타입</th><th class="center">필수</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>user_pk_id</code></td><td>string</td><td class="center">필수</td><td>파트너 회원 PK</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td class="center">선택</td><td>특정 상태 배열만 반환 — <code>active</code> | <code>completed</code> | <code>expired</code> (미지정 시 전체)</td></tr>
+  </tbody>
+</table>
+<p><b>Response (성공)</b> — 상태별 배열, 각 항목은 과정 단위:</p>
+<pre><code>{
+  "active": [
+    {
+      "pagoda_course_id": "pagoda-1023",
+      "course_id": "uuid-a",
+      "course_name": "Business Presentation Skills",
+      "start_date": "2026-06-01",
+      "end_date": "2026-08-31",
+      "level": "B2",
+      "completion_rate": 0.35
+    }
+  ],
+  "completed": [
+    {
+      "pagoda_course_id": "pagoda-0917",
+      "course_id": "uuid-b",
+      "course_name": "Business Speaking Basic",
+      "start_date": "2025-09-01",
+      "end_date": "2025-11-30",
+      "level": "B1",
+      "completion_rate": 1.0
+    },
+    {
+      "pagoda_course_id": "pagoda-0301",
+      "course_id": "uuid-c",
+      "course_name": "Daily Conversation",
+      "start_date": "2025-03-01",
+      "end_date": "2025-05-31",
+      "level": "A2",
+      "completion_rate": 1.0
+    }
+  ],
+  "expired": []
+}</code></pre>
+<p><b>응답 필드 설명</b> (배열 항목 필드는 <code>[]</code> 표기):</p>
+<table>
+  <thead><tr><th>필드</th><th>타입</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>active</code> / <code>completed</code> / <code>expired</code></td><td>array</td><td>상태별 과정 배열 — 수강중 / 이수완료 / 기간만료. 비어 있으면 <code>[]</code></td></tr>
+    <tr><td><code>[]pagoda_course_id</code></td><td>string</td><td>파고다(파트너) 과정 ID</td></tr>
+    <tr><td><code>[]course_id</code></td><td>string</td><td>픽클래스 과정 UUID — picklass <code>courses</code> 매핑 키</td></tr>
+    <tr><td><code>[]course_name</code></td><td>string</td><td>과정명</td></tr>
+    <tr><td><code>[]start_date</code></td><td>string</td><td>수강 시작일 (YYYY-MM-DD)</td></tr>
+    <tr><td><code>[]end_date</code></td><td>string</td><td>수강 종료(예정)일 (YYYY-MM-DD)</td></tr>
+    <tr><td><code>[]level</code></td><td>string</td><td>과정 레벨 (CEFR — 예: <code>B2</code> · <code>B1</code> · <code>A2</code>)</td></tr>
+    <tr><td><code>[]completion_rate</code></td><td>number (0–1)</td><td>이수율 (수강 내역 진행 바 — 예: 0.35 = 35%)</td></tr>
+  </tbody>
+</table>
+<div class="callout note">
+  <h4>학습 실행 옵션은 picklass 과정 설정에서</h4>
+  <p>이수 조건(목표 발화·이수율)·FRT(종료 조건·마이크 모드)·자유학습 등 <b>학습 실행 옵션</b>은 파트너가 내려주지 않고, <code>course_id</code>로 매핑되는 <b>picklass 과정(<code>courses</code>) 설정</b>을 따른다. 파트너 수강목록 API는 <b>과정 식별·기간·레벨·이수율</b>만 제공한다.</p>
+</div>
+
+<h4>수강 내역 화면 매핑</h4>
+<p>학습자 <b>수강 내역</b> 화면의 과정 카드는 본 API 응답으로 직접 렌더링한다.</p>
+<table>
+  <thead><tr><th>화면 항목</th><th>응답 필드</th></tr></thead>
+  <tbody>
+    <tr><td>과정명</td><td><code>course_name</code></td></tr>
+    <tr><td>레벨 (B2 · B1 · A2)</td><td><code>level</code></td></tr>
+    <tr><td>상태 (수강중 / 종료)</td><td>배열 키 — <code>active</code>→수강중, <code>completed</code>·<code>expired</code>→종료</td></tr>
+    <tr><td>기간</td><td><code>start_date</code> ~ <code>end_date</code></td></tr>
+    <tr><td>이수율 (%)</td><td><code>completion_rate</code> × 100 (진행 바)</td></tr>
+    <tr><td>리포트 버튼</td><td><code>completed</code> 배열 항목 &amp; picklass 학습 결과(리포트) 존재 시 노출</td></tr>
+  </tbody>
+</table>
+
+<p><b>오류 코드 규격</b>:</p>
+<table>
+  <thead><tr><th>code</th><th>HTTP</th><th>의미</th></tr></thead>
+  <tbody>
+    <tr><td><code>MEMBER_NOT_FOUND</code></td><td>404</td><td>존재하지 않는 파트너 회원</td></tr>
+    <tr><td><code>NO_ENROLLMENT</code></td><td>200</td><td>수강 내역 없음 (<code>active</code>·<code>completed</code>·<code>expired</code> 모두 <code>[]</code>)</td></tr>
+  </tbody>
+</table>
+
+<h3>2-3. 학습 결과 조회 API</h3>
+<p><b>픽클래스 → 파트너</b> (파트너 Pull 방식)</p>
+<p>픽클래스가 학습 결과 데이터를 제공하고, 파트너가 픽클래스 API를 호출하여 수집한다. 파트너는 이 데이터로 수강생의 이수 여부·성과를 직접 판단한다.</p>
+
+<h4>제공 방식</h4>
+<p>Pull 방식(RESTful 조회)으로 구현한다. Webhook은 구현 범위 외.</p>
+
+<h4>인증</h4>
+<p>모든 학습 결과 조회 API는 API Key 인증을 사용한다. 키는 <b>고정 헤더 <code>X-API-Key</code></b>로 전달한다 (<code>Authorization: Bearer</code> 미사용).<br>
+API Key는 백오피스 <b>시스템 &gt; API키관리</b> (<code>/admin/b2b/api-keys</code>)에서 파트너사별로 발급·만료 관리한다.</p>
+<pre><code>X-API-Key: {apiKey}</code></pre>
+<table>
+  <thead><tr><th>항목</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td>키 형식</td><td>UUID v4 기반 랜덤 문자열</td></tr>
+    <tr><td>범위</td><td>파트너 기관 단위 발급 — API Key로 기관 범위 자동 적용</td></tr>
+    <tr><td>만료</td><td>백오피스에서 수동 만료 처리</td></tr>
+    <tr><td>갱신</td><td>신규 발급 후 구키 만료 처리 (동시에 두 개 운용 가능, 전환 기간)</td></tr>
+  </tbody>
+</table>
+
+<h4>Pull API 스펙</h4>
+<div class="callout note">
+  <h4>백엔드 ↔ 백엔드 호출</h4>
+  <p>학습 결과 조회 API는 <b>파트너 백엔드 → 픽클래스 백엔드</b>의 server-to-server 호출이다 (학습자 브라우저·앱 미경유). 따라서:</p>
+  <ul>
+    <li>API Key(<code>X-API-Key</code>)는 <b>파트너 백엔드에만 보관</b> — 프론트엔드·클라이언트에 노출 금지.</li>
+    <li>브라우저 CORS와 무관. 필요 시 <b>파트너 서버 IP allowlist</b>로 접근을 추가 제한할 수 있다.</li>
+    <li>응답 데이터는 파트너 백엔드가 수신·저장하며, 학습자 단말에 직접 전달되지 않는다.</li>
+  </ul>
+</div>
+<p><b>Base URL</b>: <code>https://api.picklass.com</code></p>
+<p><b>공통 Query Parameters</b> (3개 엔드포인트 동일):</p>
+<table>
+  <thead><tr><th>파라미터</th><th>타입</th><th class="center">필수</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>startDate</code></td><td>string (ISO 8601)</td><td class="center">필수</td><td>기간 시작일</td></tr>
+    <tr><td><code>endDate</code></td><td>string (ISO 8601)</td><td class="center">필수</td><td>기간 종료일</td></tr>
+    <tr><td><code>userId</code></td><td>string</td><td class="center">선택</td><td>특정 회원 필터 (파트너 로그인 ID)</td></tr>
+    <tr><td><code>courseId</code></td><td>UUID</td><td class="center">선택</td><td>특정 과정 필터</td></tr>
+  </tbody>
+</table>
+<blockquote><p>API Key로 파트너 기관 범위 자동 적용 — 타 기관 데이터 접근 불가.<br>
+<code>userName</code>은 제공하지 않음 — 파트너가 <code>userId</code> · <code>userPkId</code> 기준으로 자체 매핑.</p></blockquote>
+
+<h4>KPI 1 — <code>GET /b2b/reports/learning-status</code> (기간별 학습현황)</h4>
+<pre><code>GET /b2b/reports/learning-status
+X-API-Key: {API_KEY}</code></pre>
+<p><b>응답</b>:</p>
+<pre><code>{
+  "period": { "startDate": "2026-04-01", "endDate": "2026-04-30" },
+  "records": [
+    {
+      "no": 1,
+      "institutionName": "픽클래스기업",
+      "userId": "partner_user_001",
+      "userPkId": "partner-internal-pk-001",
+      "method": "IA",
+      "level": "LEVEL 5",
+      "courseName": "[Vol.80] News&amp;Story Intermediate",
+      "totalLessons": 20,
+      "lessonDurationMin": 20,
+      "courseStartDate": "2026-04-01",
+      "courseEndDate": "2026-04-30",
+      "completedLessons": 8,
+      "attendedLessons": 7,
+      "isCompleted": true
+    }
+  ]
+}</code></pre>
+<table>
+  <thead><tr><th>필드</th><th>타입</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>institutionName</code></td><td>string</td><td>기업명 (<code>institutions.name</code>)</td></tr>
+    <tr><td><code>userId</code></td><td>string</td><td>파트너 로그인 ID</td></tr>
+    <tr><td><code>userPkId</code></td><td>string</td><td>파트너 내부 PK</td></tr>
+    <tr><td><code>method</code></td><td>string</td><td>수업 방식 (<code>courses</code> 테이블 타입 코드)</td></tr>
+    <tr><td><code>level</code></td><td>string</td><td>수강 레벨</td></tr>
+    <tr><td><code>courseName</code></td><td>string</td><td>과목명</td></tr>
+    <tr><td><code>totalLessons</code></td><td>number</td><td>총 수업 회차</td></tr>
+    <tr><td><code>lessonDurationMin</code></td><td>number</td><td>회당 수업 시간(분)</td></tr>
+    <tr><td><code>courseStartDate</code></td><td>string</td><td>수업 시작일</td></tr>
+    <tr><td><code>courseEndDate</code></td><td>string</td><td>수업 종료일</td></tr>
+    <tr><td><code>completedLessons</code></td><td>number</td><td>수업 시수 (완료 레슨 수)</td></tr>
+    <tr><td><code>attendedLessons</code></td><td>number</td><td>출석 횟수</td></tr>
+    <tr><td><code>isCompleted</code></td><td>boolean</td><td>수료 여부</td></tr>
+  </tbody>
+</table>
+
+<h4>KPI 2 — <code>GET /b2b/reports/class-kpi</code> (기간별 학습결과/수업KPI)</h4>
+<pre><code>GET /b2b/reports/class-kpi
+X-API-Key: {API_KEY}</code></pre>
+<p><b>응답</b>:</p>
+<pre><code>{
+  "period": { "startDate": "2026-04-01", "endDate": "2026-04-30" },
+  "records": [
+    {
+      "no": 1,
+      "userId": "partner_user_001",
+      "userPkId": "partner-internal-pk-001",
+      "level": "LEVEL 5",
+      "scores": {
+        "pragmatics": 6,
+        "fluency": 6,
+        "pronunciation": 5,
+        "vocabulary": 5,
+        "grammar": 5,
+        "total": 27
+      },
+      "comments": "Hi Neo! Your efforts to..."
+    }
+  ]
+}</code></pre>
+<table>
+  <thead><tr><th>필드</th><th>타입</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>userId</code></td><td>string</td><td>파트너 로그인 ID</td></tr>
+    <tr><td><code>userPkId</code></td><td>string</td><td>파트너 내부 PK</td></tr>
+    <tr><td><code>level</code></td><td>string</td><td>수강 레벨</td></tr>
+    <tr><td><code>scores.pragmatics</code></td><td>number (0–10)</td><td>화용성</td></tr>
+    <tr><td><code>scores.fluency</code></td><td>number (0–10)</td><td>유창성</td></tr>
+    <tr><td><code>scores.pronunciation</code></td><td>number (0–10)</td><td>발음</td></tr>
+    <tr><td><code>scores.vocabulary</code></td><td>number (0–10)</td><td>어휘</td></tr>
+    <tr><td><code>scores.grammar</code></td><td>number (0–10)</td><td>문법</td></tr>
+    <tr><td><code>scores.total</code></td><td>number (0–50)</td><td>합계</td></tr>
+    <tr><td><code>comments</code></td><td>string | null</td><td>강사 코멘트</td></tr>
+  </tbody>
+</table>
+
+<h4>KPI 3 — <code>GET /b2b/reports/level-test</code> (기간별 학습 성과/레벨테스트)</h4>
+<pre><code>GET /b2b/reports/level-test
+X-API-Key: {API_KEY}</code></pre>
+<p><b>응답</b>:</p>
+<pre><code>{
+  "period": { "startDate": "2026-04-01", "endDate": "2026-04-30" },
+  "records": [
+    {
+      "no": 1,
+      "userId": "partner_user_001",
+      "userPkId": "partner-internal-pk-001",
+      "level": "LEVEL 5",
+      "initialScore": 27,
+      "monthlyScore": 27,
+      "improvement": 0
+    }
+  ]
+}</code></pre>
+<table>
+  <thead><tr><th>필드</th><th>타입</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td><code>userId</code></td><td>string</td><td>파트너 로그인 ID</td></tr>
+    <tr><td><code>userPkId</code></td><td>string</td><td>파트너 내부 PK</td></tr>
+    <tr><td><code>level</code></td><td>string</td><td>수강 레벨</td></tr>
+    <tr><td><code>initialScore</code></td><td>number</td><td>기간 내 최초 레벨테스트 점수</td></tr>
+    <tr><td><code>monthlyScore</code></td><td>number</td><td>기간 내 최종 레벨테스트 점수</td></tr>
+    <tr><td><code>improvement</code></td><td>number</td><td>향상도 (<code>monthlyScore - initialScore</code>, 서버 계산)</td></tr>
+  </tbody>
+</table>
+
+<p><b>공통 오류 코드 규격</b>:</p>
+<table>
+  <thead><tr><th>code</th><th>HTTP</th><th>의미</th></tr></thead>
+  <tbody>
+    <tr><td><code>UNAUTHORIZED</code></td><td>401</td><td>API Key 없음 또는 만료</td></tr>
+    <tr><td><code>INVALID_DATE_RANGE</code></td><td>400</td><td>날짜 범위 오류</td></tr>
+    <tr><td><code>MISSING_REQUIRED_PARAM</code></td><td>400</td><td><code>startDate</code> 또는 <code>endDate</code> 누락</td></tr>
+  </tbody>
+</table>
+
+<!-- ───────────────────────── 3. packages/core ───────────────────────── -->
+<h2 id="sec-core">3. packages/core — PartnerApiClient 서비스</h2>
+
+<h3>3-1. 위치</h3>
+<pre><code>packages/core/src/partner-api/
+  ├─ partner-api.module.ts
+  ├─ partner-api.service.ts    ← 파트너 연동 설정 조회
+  └─ partner-api-client.service.ts  ← 실제 HTTP 호출 + 로그 기록</code></pre>
+
+<h3>3-2. PartnerApiClientService 인터페이스</h3>
+<pre><code>// packages/core/src/partner-api/partner-api-client.service.ts
+
+export interface PartnerAuthResult {
+  institutionId: string;
+  user_pk_id: string;
+  userId: string;
+  level: string | null;   // 사용자 레벨 (파트너 미운용 시 null)
+  status: string;
+}
+
+export interface PartnerCourse {
+  pagodaCourseId: string;             // 파고다(파트너) 과정 ID
+  courseId: string;                   // 픽클래스 과정 UUID (courses 매핑 키)
+  courseName: string;
+  startDate: string;                  // YYYY-MM-DD
+  endDate: string;                    // YYYY-MM-DD
+  level: string;                      // CEFR (B2 · B1 · A2 …)
+  completionRate: number;             // 이수율 0–1 (수강 내역 진행 바)
+}
+
+export interface PartnerEnrollmentResponse {
+  active: PartnerCourse[];            // 수강중
+  completed: PartnerCourse[];         // 이수완료
+  expired: PartnerCourse[];           // 기간만료
+}
+// 학습 실행 옵션(이수조건·FRT·마이크 모드 등)은 파트너가 아니라
+// courseId로 매핑되는 picklass 과정(courses) 설정을 따른다.
+
+export class PartnerApiClientService {
+  // 로그인 Step 1: 파트너 로그인 페이지 redirect URL 생성
+  async buildLoginRedirectUrl(
+    institutionId: string,
+    callbackUrl: string,
+    state: string
+  ): Promise&lt;string&gt;
+  // {login_page_url}?callback=...&amp;institutionId=...&amp;state=... 반환
+
+  // 로그인 Step 2: callback 토큰 검증 → 사용자 정보 추출
+  async verifyAuthCallback(
+    institutionId: string,
+    token: string,
+    state: string,
+    expectedState: string
+  ): Promise&lt;PartnerAuthResult&gt;
+  // state(1회성)·alg(HS256 고정)·서명·시각(exp·iat leeway)·jti(replay)·iss·institutionId 검증
+  // 인증 로그 기록(토큰·시크릿 마스킹). 실패 시 PartnerAuthException throw
+
+  // 수강목록: 파트너 수강목록 API 호출 (상태별 배열 — active/completed/expired)
+  async getEnrollments(
+    institutionId: string,
+    user_pk_id: string,
+    status?: 'active' | 'completed' | 'expired'   // 미지정 시 전체
+  ): Promise&lt;PartnerEnrollmentResponse&gt;
+  // 실패 시 PartnerApiException throw
+
+  // 내부: 파트너 연동 설정 조회
+  private async getConfig(institutionId: string): Promise&lt;PartnerApiConfig&gt;
+}</code></pre>
+
+<h3>3-3. 오류 처리 전략</h3>
+<table>
+  <thead><tr><th>상황</th><th>동작</th></tr></thead>
+  <tbody>
+    <tr><td>파트너 API 응답 없음 (timeout)</td><td>로그 기록 후 <code>ServiceUnavailableException</code></td></tr>
+    <tr><td>파트너 응답 4xx</td><td>로그 기록 후 적절한 HTTP 오류로 변환</td></tr>
+    <tr><td>파트너 연동 설정 없음</td><td>로그 기록 후 <code>NotFoundException</code></td></tr>
+    <tr><td>수강목록 응답 빈 배열</td><td>정상 처리 (<code>active</code>·<code>completed</code>·<code>expired</code> 빈 배열 반환)</td></tr>
+    <tr><td><code>verifyAuthCallback()</code> 검증 실패 (state·서명·만료·institutionId)</td><td>인증 로그에 <code>success: false</code> 기록 후 <code>PartnerAuthException</code> throw — HTTP 출처 없음 (로컬 검증)</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  <p class="meta">본 문서는 <code>20260526_B2B파트너_외부API_연동_개발계획.md</code>를 HTML로 변환·개정한 문서입니다. 채널·페이로드·인증 규약은 양사 협의 결과에 따라 확정·갱신됩니다.</p>
+  <p class="meta">picklass · backoffice / b2b — 작성 2026-05-26 · 최종 수정 2026-06-17</p>
+</footer>
+
+</body>
+</html>

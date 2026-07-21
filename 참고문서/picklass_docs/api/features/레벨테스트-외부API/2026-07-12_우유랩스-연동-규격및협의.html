@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우유랩스 스피킹앱 ↔ 픽클래스 연동 규격서 — 모듈 콘텐츠 + 레벨테스트 API</title>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+:root{--ink:#0f172a;--ink-soft:#334155;--muted:#64748b;--line:#e2e8f0;--accent:#4a9278;--accent-strong:#3b7561;--accent-soft:#f0f9f6;--accent-border:#b8e4d3;--bg-page:#f1f5f9;--bg-card:#fff;--code-bg:#eef2f7;--pre-bg:#0f172a;--pre-ink:#e2e8f0;--radius:12px}
+*{box-sizing:border-box}
+html{background:var(--bg-page);-webkit-text-size-adjust:100%}
+body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;width:min(93%,1040px);margin:2.5rem auto;padding:clamp(1.8rem,4vw,3.2rem);background:var(--bg-card);border-radius:18px;box-shadow:0 1px 2px rgba(20,23,40,.04),0 18px 50px -28px rgba(20,23,40,.28);line-height:1.72;color:var(--ink-soft);font-size:15.5px;letter-spacing:-.003em}
+h1{font-size:1.6rem;color:var(--ink);margin:.2rem 0 .5rem;letter-spacing:-.02em;line-height:1.35}
+h2{font-size:1.22rem;color:var(--ink);margin:2.7rem 0 .9rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent-border)}
+h2.part{background:var(--accent);color:#fff;border:none;padding:.55rem 1rem;border-radius:10px;font-size:1.15rem}
+h3{font-size:1.02rem;color:var(--accent-strong);margin:1.7rem 0 .5rem}
+a{color:var(--accent-strong)}
+code{background:var(--code-bg);padding:.1em .42em;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.87em;color:#0b4a37}
+pre{background:var(--pre-bg);color:var(--pre-ink);padding:1rem 1.15rem;border-radius:var(--radius);overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.55}
+pre code{background:none;color:inherit;padding:0}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.87rem}
+th,td{border:1px solid var(--line);padding:.5rem .65rem;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);color:var(--ink);font-weight:700}
+tbody tr:nth-child(even){background:#fafcfb}
+.meta{color:var(--muted);font-size:.92rem;margin:0 0 1.6rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+.meta b{color:var(--ink-soft)}
+.toc{background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);padding:.9rem 1.3rem;margin:1.2rem 0;font-size:.9rem}
+.toc a{text-decoration:none} .toc b{color:var(--ink)}
+.card{background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--radius);padding:.9rem 1.15rem;margin:1rem 0}
+.ask{background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--radius);padding:.95rem 1.15rem;margin:1rem 0}
+.ask h3{color:#b45309;margin-top:0}
+.badge{display:inline-block;padding:.1em .6em;border-radius:999px;font-size:.74rem;font-weight:700;white-space:nowrap}
+.done{background:#dcfce7;color:#166534}
+.wait{background:#fef9c3;color:#854d0e}
+.post{display:inline-block;background:#1e3a8a;color:#fff;font-size:.72rem;font-weight:700;padding:.1em .5em;border-radius:5px;margin-right:.4rem}
+.dir{font-family:ui-monospace,monospace;font-size:.85em;color:var(--muted)}
+ul{padding-left:1.15rem;margin:.5rem 0}
+li{margin:.26rem 0}
+.foot{margin-top:2.8rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+.flow{background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);padding:1rem 1.2rem;margin:1rem 0;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<h1>우유랩스 스피킹앱 ↔ 픽클래스 연동 규격서<br><span style="font-size:1.05rem;color:var(--accent-strong)">모듈 콘텐츠(Doc B) + 레벨테스트 API 통합</span></h1>
+<div class="meta">
+<b>수신</b> 우유랩스 &nbsp;·&nbsp; <b>발신</b> 픽클래스(오이지) &nbsp;·&nbsp; <b>작성일</b> 2026-07-12<br>
+<b>Base URL</b> 라이브 <code>https://api.picklass.com</code> · 개발 <code>https://api-picklass-com.vercel.app</code> &nbsp;·&nbsp; <b>경로</b> <code>/external/*</code> &nbsp;·&nbsp; <b>콘텐츠 정본</b> 스피킹모듈 데이터 샘플 엑셀
+</div>
+
+<div class="card">
+픽클래스는 우유랩스 스피킹앱에 <b>학습 콘텐츠 · AI 채점 · 레벨 진단</b>을 API로 제공합니다. 본 규격서는 <b>Part A. 모듈 콘텐츠 연동(Doc B)</b> 과 <b>Part B. 신규 레벨테스트 API</b> 를 하나로 통합하고, 마지막에 <b>협의 요청</b>을 정리했습니다.
+</div>
+
+<div class="toc">
+<b>목차</b><br>
+Part A — 모듈 콘텐츠 연동(Doc B): <a href="#a1">API 목록</a> · <a href="#a2">8개 모듈</a> · <a href="#a3">verify 규격</a> · <a href="#a4">moduleQuestions</a> · <a href="#a5">모듈별 스키마</a> · <a href="#a6">results 규격</a> · <a href="#a7">레벨별 표현·어휘</a><br>
+Part B — 레벨테스트 API: <a href="#b1">역할</a> · <a href="#b2">흐름</a> · <a href="#b3">엔드포인트</a> · <a href="#b4">요청·응답 예시</a><br>
+<a href="#ask">협의 요청</a>
+</div>
+
+<h2 class="part">Part A. 모듈 콘텐츠 연동 (Doc B)</h2>
+<p>학습자가 앱에서 모듈 진입 시 토큰으로 픽클래스에 검증(verify)을 요청하면, 픽클래스가 <b>레벨·차시에 맞는 콘텐츠를 골라 응답에 실어</b> 전달합니다. 학습 종료 시 결과를 results로 수신합니다.</p>
+
+<h3 id="a1">A-1. API 목록</h3>
+<table>
+<thead><tr><th>#</th><th>방향</th><th>엔드포인트</th><th>메서드</th><th>인증</th><th>현황</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="dir">앱→픽클래스</td><td><code>/external/verify</code></td><td>GET</td><td>X-Access-Token</td><td><span class="badge done">제공중</span></td></tr>
+<tr><td>2</td><td class="dir">앱→픽클래스</td><td><code>/external/tokens/expire</code></td><td>POST</td><td>X-Access-Token</td><td><span class="badge done">제공중</span></td></tr>
+<tr><td>3</td><td class="dir">앱→픽클래스</td><td><code>/external/results</code></td><td>POST</td><td>X-Access-Token</td><td><span class="badge done">제공중</span></td></tr>
+<tr><td>4</td><td class="dir">시스템→픽클래스</td><td><code>/external/tokens/issue</code></td><td>POST</td><td>X-Admin-Secret</td><td><span class="badge done">제공중</span></td></tr>
+<tr><td>5</td><td class="dir">시스템→픽클래스</td><td><code>/external/lessons</code></td><td>GET</td><td>X-Admin-Secret</td><td><span class="badge done">제공중</span></td></tr>
+</tbody>
+</table>
+<p>학습자용 공통 헤더: <code>X-Access-Token</code>(진입 토큰) + <code>X-Module-Code</code>(8개 모듈 중 하나). 토큰 발급(#4)·차시 조회(#5)는 <code>X-Admin-Secret</code> 보호. 동일 (학습자·레슨·모듈) 유효 토큰은 재사용됩니다.</p>
+
+<h3 id="a1b">A-1b. 차시 목록 조회 → courseLessonId 확보</h3>
+<p>외부에서는 픽클래스 내부 <code>courseLessonId</code>(uuid)를 알 수 없습니다. <b>토큰 발급 전</b>, 학습자의 수강 차시 목록을 조회해 <code>courseLessonId</code>를 확보합니다.</p>
+<pre><code>GET /external/lessons?userId={학습자 user_id}&amp;moduleCode=LRN
+// header: X-Admin-Secret
+
+→ { "userId":"...", "moduleCode":"LRN", "count":2,
+    "lessons":[
+      { "courseLessonId":"dea1e7ac-...", "courseTitle":"쇼핑몰 가기",
+        "lessonOrder":1, "topic":"...",
+        "hasModuleContent":true, "moduleQuestionCount":13 } ] }
+// moduleCode 생략 시 hasModuleContent·moduleQuestionCount 없이 전 차시 반환</code></pre>
+<div class="flow">
+<b>진입·콘텐츠 수신 흐름</b><br>
+① <code>GET /external/lessons</code>(userId, moduleCode) → <b>courseLessonId 목록</b><br>
+② <code>POST /external/tokens/issue</code>(userId, courseLessonId, moduleCode) → <b>원타임 token</b><br>
+③ <code>GET /external/verify</code>(token) → <b>모듈 콘텐츠(moduleQuestions[])</b>
+</div>
+<p>※ 차시 목록은 학습자의 <b>활성 수강 과정</b> 기준이며, <code>moduleQuestionCount</code>로 해당 모듈 콘텐츠가 있는 차시를 골라낼 수 있습니다.</p>
+
+<h3 id="a2">A-2. 8개 모듈</h3>
+<table>
+<thead><tr><th>코드</th><th>이름</th><th>type</th><th>문항수</th><th>비고</th></tr></thead>
+<tbody>
+<tr><td>LRN</td><td>Learn &amp; Study</td><td>audio-listen</td><td>single</td><td>강의영상 + 표현카드(탭)</td></tr>
+<tr><td>VLM</td><td>Vocabulary Listening &amp; Meaning</td><td>audio-listen</td><td>multi</td><td>단어 듣기(탭)</td></tr>
+<tr><td>SHD</td><td>Shadowing Drill</td><td>audio-record</td><td>multi</td><td>따라 말하기(발화)</td></tr>
+<tr><td>SFB</td><td>Sentence Fill-in Blank</td><td>audio-record</td><td>multi</td><td>빈칸 완성 발화</td></tr>
+<tr><td>SMK</td><td>Sentence Making Drill</td><td>audio-record</td><td>multi</td><td>새 문장 + AI 코칭</td></tr>
+<tr><td>RPB</td><td>Role-Play Basic</td><td>audio-record</td><td>single</td><td>대본 역할극</td></tr>
+<tr><td>RPF</td><td>Role-Play Free</td><td>audio-record</td><td>single</td><td>자유 역할극</td></tr>
+<tr><td>OMP</td><td>One Minute Presentation</td><td>audio-record</td><td>single</td><td>30초 준비 + 1분 발표, AI 채점, 재도전 없음</td></tr>
+</tbody>
+</table>
+<div class="card"><b>표현 연계(중요)</b>: LRN → SHD → SFB → SMK는 <b>같은 핵심 표현 세트</b>를 단계만 바꿔 반복합니다. 한 세션 안에서 동일 표현세트로 묶여 전달됩니다.</div>
+
+<h3 id="a3">A-3. verify 응답 규격 (#1)</h3>
+<p>요청: <code>GET /external/verify</code> + 헤더(X-Access-Token, X-Module-Code). 응답의 <code>lesson.text.moduleQuestions[]</code>에 해당 모듈 문항 배열을 동봉합니다. <code>module</code> 메타 중 모듈별로 다른 값: <code>answerType · uiTemplate · questionCount · questionMin/MaxCount</code>.</p>
+<pre><code>{
+  "lessonId": "lesson-restaurant-01",
+  "user": { "userId": "u_12345", "name": "홍길동" },
+  "module": {
+    "code": "SHD", "name": "Shadowing Drill", "skill": "speaking",
+    "uiTemplate": "voice",            // standard(듣기) | voice(발화)
+    "answerType": "audio-record",     // audio-listen(탭) | audio-record(발화)
+    "scoringMode": "absolute",
+    "passageExposureMode": "sentence",
+    "feedbackStyle": "encouraging",
+    "questionCount": "multi",         // single | multi
+    "questionMinCount": 3, "questionMaxCount": 7
+  },
+  "lesson": {
+    "id": "lesson-restaurant-01", "topic": "식당에서 음식 주문하기", "lessonOrder": 1,
+    "text": {
+      "title": "식당에서 음식 주문하기",
+      "content": "", "speakingContent": null,   // FRT만 사용
+      "level": "B1", "category": "daily", "wordCount": null,
+      "moduleQuestions": [ /* A-4 형태의 문항 원소들 */ ]
+    }
+  }
+}</code></pre>
+
+<h3 id="a4">A-4. moduleQuestions[] 공통 봉투</h3>
+<table>
+<thead><tr><th>필드(camelCase)</th><th>타입</th><th>필수</th><th>설명</th></tr></thead>
+<tbody>
+<tr><td>questionId</td><td>string</td><td>O</td><td>문항 고유 ID</td></tr>
+<tr><td>questionNumber</td><td>number</td><td>O</td><td>문항 번호(1부터)</td></tr>
+<tr><td>type</td><td>enum</td><td>O</td><td>audio-listen(탭) / audio-record(발화)</td></tr>
+<tr><td>instruction</td><td>string(한글)</td><td>O</td><td>학습자 지시문</td></tr>
+<tr><td>text</td><td>string</td><td>O</td><td>화면 본문(문장·단어·블랭크·토픽)</td></tr>
+<tr><td>options</td><td>JSON(모듈별)</td><td>O</td><td>콘텐츠 본체</td></tr>
+<tr><td>answer</td><td>JSON(모듈별)</td><td>발화모듈</td><td>정답·채점기준. 듣기 모듈(LRN·VLM)은 null</td></tr>
+<tr><td>hints</td><td>JSON/string</td><td>일부</td><td>SMK(객체)·SFB(연계표현 string)</td></tr>
+<tr><td>source</td><td>JSON/string</td><td>일부</td><td>RPB·RPF(시나리오·페르소나), SFB(정답문장)</td></tr>
+<tr><td>sortOrder</td><td>number</td><td>O</td><td>정렬</td></tr>
+<tr><td>questionStatus</td><td>string</td><td>O</td><td>active 등</td></tr>
+</tbody>
+</table>
+<p>전달 주의: ① <code>options/answer/hints/source</code>는 <b>파싱된 JSON</b>(문자열 이중 인코딩 금지). ② 필드명 camelCase. ③ threshold(<code>asrThreshold</code>·<code>exprApropThreshold</code>·<code>missionUsageThreshold</code>, 보통 70)는 합격 기준값 — 미만이면 자동 1회 재도전(OMP 제외).</p>
+
+<h3 id="a5">A-5. 모듈별 options / answer / hints 스키마</h3>
+<p>실제 값·완전 예시는 <b>스피킹모듈 데이터 샘플 엑셀(정본)</b> 기준입니다. 아래는 형태 요약.</p>
+<table>
+<thead><tr><th>모듈</th><th>text</th><th>options</th><th>answer</th><th>hints</th></tr></thead>
+<tbody>
+<tr><td>LRN</td><td>표현 요약</td><td><code>{expressionList[]{expression,meaningKr,usage,exampleEn,exampleKr}, readCompletionThreshold, videoUrl?}</code></td><td>—</td><td>—</td></tr>
+<tr><td>VLM</td><td>단어</td><td><code>{word, sampleEn, sampleKr, meaningKr, audioUrl?, sampleAudioUrl?}</code></td><td>—</td><td>—</td></tr>
+<tr><td>SHD</td><td>영어 문장</td><td><code>{meaningKr}</code></td><td><code>{sentence, asrThreshold, phoneticGuide, pronunciationPoints[], passSpeeds[]}</code></td><td>—</td></tr>
+<tr><td>SFB</td><td>블랭크 문장</td><td><code>{meaningKr}</code></td><td><code>{fullSentence, blankAnswer, asrThreshold, pronunciationPoints[]}</code></td><td>연계표현(string) · source=정답문장</td></tr>
+<tr><td>SMK</td><td>한글 가이드</td><td><code>modelEnglish(string)</code></td><td><code>{targetExpression, modelEnglish, alternativeAnswers[], evalCriteria{}, exprApropThreshold}</code></td><td><code>{button, direct}</code></td></tr>
+<tr><td>RPB</td><td>안내문</td><td><code>{dialogue[]{turnNo,speaker,role,en,meaningKr}}</code></td><td><code>{learnerTargetLines[], missionExpressions[], asrThreshold}</code></td><td>source=<code>{scenario,persona{name,role,tone}}</code></td></tr>
+<tr><td>RPF</td><td>미션 안내</td><td><code>{branchPool[]{branchType,promptEn,meaningKr,targetMission}, missionChecklist[]}</code></td><td><code>{missionExpressions[], interactionActCriteria{}, missionUsageThreshold}</code></td><td>source=<code>{scenario,persona}</code></td></tr>
+<tr><td>OMP</td><td>토픽+안내</td><td><code>{topicEn, topicKr, description}</code></td><td><code>{topic{en,kr}, keywords[], memoTemplate[], modelKeyPoints[], evalRubric{fiveAxis[],ompFour{}}, prepSeconds, speakSeconds}</code></td><td>—</td></tr>
+</tbody>
+</table>
+<p>문항수: <b>multi</b>=단어/문장마다 1문항, <b>single</b>=리스트·대화·토픽 전체가 1문항.</p>
+
+<h3 id="a6">A-6. results — 학습 결과 수신 (#3)</h3>
+<p>세션 종료 시 1회 집계 송신. <code>scores</code>는 5축, <code>measures</code>는 모듈 고유 지표(5축과 중복 금지), <code>results[]</code>는 문항별 상세(선택).</p>
+<pre><code>POST /external/results   // headers: X-Access-Token, X-Module-Code
+{
+  "lessonId": "lesson-restaurant-01", "userId": "u_12345", "moduleCode": "SHD",
+  "level": 8,
+  "passRate": 0.83,        // 정답률(재도전 판정, 0~1)
+  "retakeCount": 0,        // 자동 재도전(0|1)
+  "scores": { "pronunciation":78,"fluency":72,"grammar":80,"appropriateness":75,"volume":70 },
+  "measures": { /* 모듈별 내부 측정값 - 아래 표 */ },
+  "results": [
+    { "questionId":"shd-restaurant-001","seq":0,"passed":true,"attempt":1,"retakeCycle":0,"durationMs":4200,
+      "pronunciation": { "accuracy":82,"fluency":74,"completeness":90,"prosody":70,"score":79,"errorWords":1 } }
+  ]
+}</code></pre>
+<p><b>모듈별 measures</b> (5축 외 내부 측정값):</p>
+<table>
+<thead><tr><th>모듈</th><th>측정 지표</th></tr></thead>
+<tbody>
+<tr><td>LRN</td><td>영상 머문시간(staySeconds) · 완독률(readCompletion)</td></tr>
+<tr><td>VLM</td><td>없음(자기보고 — 측정·저장 제외)</td></tr>
+<tr><td>SHD</td><td>5축만</td></tr>
+<tr><td>SFB</td><td>missionUsage</td></tr>
+<tr><td>SMK</td><td>expressionApprop</td></tr>
+<tr><td>RPB</td><td>5축</td></tr>
+<tr><td>RPF</td><td>missionUsage · interactionAct</td></tr>
+<tr><td>OMP</td><td>logicStructure · reutterance · keywordUsage · ompFour{logic,expression,pronunciation,time} · (공인시험 환산)</td></tr>
+</tbody>
+</table>
+
+<h3 id="a7">A-7. 레벨별 표현/어휘 수 (CEFR)</h3>
+<table>
+<thead><tr><th>CEFR</th><th>핵심 표현 수</th><th>핵심 어휘 수</th></tr></thead>
+<tbody>
+<tr><td>Pre-A1 ~ A1</td><td>3</td><td>5</td></tr>
+<tr><td>A2</td><td>4</td><td>6</td></tr>
+<tr><td>B1</td><td>5</td><td>8</td></tr>
+<tr><td>B2</td><td>6</td><td>10</td></tr>
+<tr><td>C1 ~ C2</td><td>7</td><td>12</td></tr>
+</tbody>
+</table>
+<p>표현연계 4모듈(LRN→SHD→SFB→SMK)은 이 N개 동일 표현을 공유하며, verify의 <code>module.questionMin/MaxCount</code>도 이 수에 맞춥니다.</p>
+
+<h2 class="part">Part B. 레벨테스트(P-ALT) 외부 API — 신규</h2>
+
+<h3 id="b1">B-1. 역할 분담</h3>
+<table>
+<thead><tr><th>주체</th><th>담당</th></tr></thead>
+<tbody>
+<tr><td><b>우유랩스 앱</b></td><td>시험 화면(문항 표시·녹음·타이머·결과 표시), 사용자 인터랙션, <b>음성인식(ASR)</b> 및 전사·지표 산출</td></tr>
+<tr><td><b>픽클래스 API</b></td><td>문항 적응형 출제 · 응답 채점 · <b>최종 레벨 산출</b> · 공인시험 환산 · 세션/결과 저장</td></tr>
+</tbody>
+</table>
+<div class="card">채점·레벨 판정은 픽클래스가 담당합니다. <b>우유랩스는 전사문(및 발화 지표)만 전송</b>하면 픽클래스가 채점·레벨을 반환합니다.</div>
+
+<h3 id="b2">B-2. 시험 흐름</h3>
+<div class="flow">
+<b>PT</b>(신규 배치) 또는 <b>AT</b>(재진단)<br>
+&nbsp;&nbsp;<b>P1 어휘</b> — 문장 밑줄 단어 4지선다 (적응형 5문항)<br>
+&nbsp;&nbsp;<b>P2 낭독</b> — 문장 낭독 (적응형 3~7문장) · <span class="dir">WPM·단어일치율·ASR confidence</span><br>
+&nbsp;&nbsp;<b>P3 대화</b> — 챗봇 대화 6~10턴 · <span class="dir">전사문</span> → LLM 4축 채점<br>
+&nbsp;&nbsp;<b>P4 발표</b>(조건부, P3 평균 L7+) — 1분 발표 · <span class="dir">전사문</span> → LLM 5축<br>
+&nbsp;&nbsp;<b>최종 레벨</b> — 6대 루브릭 가중합산 + 공인시험(OPIc·토익S·IELTS·TOEFL) 환산
+</div>
+
+<h3 id="b3">B-3. 엔드포인트 (인증: 협의 §C)</h3>
+<table>
+<thead><tr><th>메서드·경로</th><th>설명</th></tr></thead>
+<tbody>
+<tr><td class="dir">POST <code>/external/level-test/sessions</code></td><td>세션 시작(PT/AT) → 세션ID + P1 첫 문항</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p1-answers</code></td><td>P1 답안 → 다음 문항 or P1 수렴레벨</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p2-start</code></td><td>P2 시작 → 첫 낭독 문장</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p2-answers</code></td><td>P2 낭독 지표 → 다음 문장 or P2 수렴레벨</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p3-start</code></td><td>P3 시작 → 첫 대화 질문</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p3-turns</code></td><td>P3 전사문 → 다음 질문 or 4축 채점·P4 판정</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p4-start</code></td><td>P4 발표 시작 → 주제(키워드3+질문)</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/p4-submit</code></td><td>P4 발표 전사문 → LLM 5축 → 최종레벨</td></tr>
+<tr><td class="dir">POST <code>.../sessions/:id/finalize</code></td><td>(P4 생략 경로) 최종레벨 산출</td></tr>
+</tbody>
+</table>
+
+<h3 id="b4">B-4. 요청·응답 예시</h3>
+
+<p><span class="post">P1</span> 세션 시작 → 첫 문항</p>
+<pre><code>POST /external/level-test/sessions
+{ "userId": "&lt;픽클래스 사용자 식별자&gt;", "testType": "PT" }
+
+→ { "sessionId": 123, "part": "P1", "itemSequence": 1, "totalItems": 5,
+    "question": { "questionId": 1, "level": 9,
+      "sentence": "She decided to postpone the meeting.",
+      "targetWord": "postpone", "options": ["연기하다","취소하다","시작하다","준비하다"],
+      "responseThresholdMs": 3000 } }</code></pre>
+
+<p><span class="post">P1</span> 답안 제출</p>
+<pre><code>POST .../sessions/123/p1-answers
+{ "questionId": 1, "selectedOption": 1, "responseTimeMs": 2200 }
+→ 다음 문항 {...}  또는  { "part":"P1","done":true,"p1FinalLevel":11,"nextPart":"P2" }</code></pre>
+
+<p><span class="post">P2</span> 낭독 지표 제출 (앱 ASR 산출값)</p>
+<pre><code>POST .../sessions/123/p2-answers
+{ "sentenceId": 45, "actualWpm": 120,
+  "wordMatchRate": 96,      // 0~100 (%)
+  "asrConfidence": 0.88,    // 0~1
+  "audioUrl": "https://..." // 선택
+}
+→ 다음 문장  또는  { "done":true,"p2FinalLevel":11,"nextPart":"P3" }</code></pre>
+
+<p><span class="post">P3</span> 대화 전사문 제출</p>
+<pre><code>POST .../sessions/123/p3-turns
+{ "userTranscript": "I usually take the subway ...", "responseLatencyMs": 1500 }
+
+→ 다음 질문 { "done":false,"turnNumber":2,"question":"What is your commute like?" }
+  또는 완료 { "done":true,
+    "rubric": { "grammar":11,"expression":11,"pragmatics":9,"vocab":10 },
+    "p3FinalLevel":10, "p4Decision":"proceed", "nextPart":"P4" }</code></pre>
+
+<p><span class="post">P4</span> 발표 전사문 제출 → 최종 결과</p>
+<pre><code>POST .../sessions/123/p4-submit
+{ "transcript": "Today I want to talk about ...", "durationSeconds": 62 }
+
+→ { "done":true, "part":"FINAL", "finalLevel":11, "cefr":"B2",
+    "rubric": { "vocab":10,"fluency":12,"pronunciation":11,"grammar":13,"expression":13,"pragmatics":9 },
+    "examConversion": { "opic":"IM3-IH","toeicSpeaking":"130-150","ielts":"5.5-6.5","toeflSpeaking":"18-24" } }</code></pre>
+
+<h2 class="part" id="ask" style="background:#b45309">협의 요청 (통합)</h2>
+
+<div class="ask">
+<h3>A. [Doc B] 모듈 연동 확정 항목</h3>
+<ul>
+<li><b>results</b>: 호출 시점(세션종료 1회 vs 문항별) · <code>measures</code> 포함 범위 · 문항별 상세 포함 여부</li>
+<li><b>콘텐츠 형식</b>: LRN 영상(URL·자막) · 오디오 출처(앱 TTS vs 음원파일) · 표현세트 연계 보장</li>
+<li><b>OMP 공인시험 환산식</b>(OPIc·토익S 환산 기준) 확정</li>
+<li>추가 학습자 정보 수신 필요 여부(현재 verify: user{userId,name}, level, module 메타)</li>
+</ul>
+</div>
+
+<div class="ask">
+<h3>B. [레벨테스트] ASR(음성인식) 지표 형식</h3>
+<ul>
+<li><b>P2</b>: <code>actualWpm</code> · <code>wordMatchRate</code>(0~100 %) · <code>asrConfidence</code>(0~1) — <b>앱이 산출·전송 가능한지</b>, confidence 스케일 확인</li>
+<li><b>P3·P4</b>: <code>transcript</code>(전사문)만 필요. 발음 정밀 측정이 필요하면 발음 지표도 함께 보낼 수 있는지</li>
+<li>WPM·일치율의 <b>계산 정의</b>가 픽클래스와 일치하는지</li>
+</ul>
+</div>
+
+<div class="ask">
+<h3>C. [공통] 인증 · 사용자 식별 · 엔드포인트</h3>
+<ul>
+<li>레벨테스트 <b>사용자 식별</b>: Doc B의 verify 토큰(핸드오프)으로 픽클래스 사용자 식별자를 확보하는 방식을 재사용할지</li>
+<li>레벨테스트 호출의 <b>인증 헤더 방식</b>(원타임/세션 토큰/파트너 키) 확정</li>
+<li>Part B 엔드포인트 경로·페이로드 필드명을 <b>우유랩스 앱 구현 기준으로 최종 확정</b>(변경/추가 항목 회신)</li>
+<li>세션 중단·재개, 타임아웃, 재시도 등 운영 규칙</li>
+</ul>
+</div>
+
+<div class="foot">
+본 문서는 픽클래스 구현 기준의 협의용 통합 규격서입니다. 협의 항목 회신 주시면 실연동 규격을 확정하겠습니다. — 픽클래스
+</div>
+
+</body>
+</html>

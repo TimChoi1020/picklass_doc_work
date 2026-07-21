@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파고다 ↔ 픽클래스 연동 — 구현 현황 및 협의 요청</title>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+:root{--ink:#0f172a;--ink-soft:#334155;--muted:#64748b;--line:#e2e8f0;--accent:#4a9278;--accent-strong:#3b7561;--accent-soft:#f0f9f6;--accent-border:#b8e4d3;--bg-page:#f1f5f9;--bg-card:#fff;--code-bg:#eef2f7;--pre-bg:#0f172a;--pre-ink:#e2e8f0;--radius:12px}
+*{box-sizing:border-box}
+html{background:var(--bg-page);-webkit-text-size-adjust:100%}
+body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;width:min(92%,980px);margin:2.5rem auto;padding:clamp(1.8rem,4vw,3.2rem);background:var(--bg-card);border-radius:18px;box-shadow:0 1px 2px rgba(20,23,40,.04),0 18px 50px -28px rgba(20,23,40,.28);line-height:1.72;color:var(--ink-soft);font-size:16px;letter-spacing:-.003em}
+h1{font-size:1.65rem;color:var(--ink);margin:.2rem 0 .5rem;letter-spacing:-.02em;line-height:1.35}
+h2{font-size:1.25rem;color:var(--ink);margin:2.6rem 0 .9rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent-border)}
+h3{font-size:1.04rem;color:var(--accent-strong);margin:1.6rem 0 .5rem}
+a{color:var(--accent-strong)}
+code{background:var(--code-bg);padding:.1em .42em;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;color:#0b4a37}
+pre{background:var(--pre-bg);color:var(--pre-ink);padding:1rem 1.15rem;border-radius:var(--radius);overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.84rem;line-height:1.6}
+pre code{background:none;color:inherit;padding:0}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:.55rem .7rem;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);color:var(--ink);font-weight:700}
+tbody tr:nth-child(even){background:#fafcfb}
+.meta{color:var(--muted);font-size:.92rem;margin:0 0 1.8rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+.meta b{color:var(--ink-soft)}
+.card{background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--radius);padding:.9rem 1.15rem;margin:1rem 0}
+.ask{background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--radius);padding:.95rem 1.15rem;margin:1rem 0}
+.ask h3{color:#b45309;margin-top:0}
+.badge{display:inline-block;padding:.1em .6em;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.done{background:#dcfce7;color:#166534}
+.wait{background:#fef9c3;color:#854d0e}
+.na{background:#e2e8f0;color:#475569}
+ul{padding-left:1.15rem;margin:.5rem 0}
+li{margin:.28rem 0}
+.dir{font-family:ui-monospace,monospace;font-size:.85em;color:var(--muted)}
+.foot{margin-top:2.8rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<h1>파고다 ↔ 픽클래스 연동<br>구현 현황 및 협의 요청</h1>
+<div class="meta">
+<b>수신</b> 파고다 &nbsp;·&nbsp; <b>발신</b> 픽클래스(오이지 역할 수행) &nbsp;·&nbsp; <b>작성일</b> 2026-07-12<br>
+<b>기준 명세</b> 파고다–오이지 연동 API 명세서 v1.2 (2026-07-07)
+</div>
+
+<div class="card">
+본 문서는 <b>파고다–오이지 연동 명세(v1.2)의 10개 API</b>에 대해 픽클래스가 <b>‘오이지’ 역할을 직접 수행</b>하여 구현한 현황과, 실연동을 위해 <b>파고다 측에 요청드리는 협의 사항</b>을 정리한 것입니다.
+</div>
+
+<h2>1. 연동 구조</h2>
+<pre><code>파고다(LMS) ──#1~6 수신──▶ 픽클래스(오이지 역할)
+            ◀──#7 로그인 인증──
+            ◀──#8~10 결과 송신──</code></pre>
+<ul>
+<li><b>#1~6</b>: 파고다 → 픽클래스 (수강신청·기수변경·환불·기간조정·종료일·설문공지) 수신</li>
+<li><b>#7</b>: 픽클래스 → 파고다 (학습자 로그인 인증)</li>
+<li><b>#8~10</b>: 픽클래스 → 파고다 (출석완료·수료완료·평가)</li>
+</ul>
+
+<h2>2. API별 구현 현황</h2>
+<table>
+<thead><tr><th>#</th><th>API</th><th>방향</th><th>메서드</th><th>픽클래스 현황</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>학습자 수강신청</td><td class="dir">파고다→픽클래스</td><td>POST</td><td><span class="badge done">구현 완료</span> 수신·적재</td></tr>
+<tr><td>2</td><td>기업 기수정보 변경</td><td class="dir">파고다→픽클래스</td><td>PATCH</td><td><span class="badge done">구현 완료</span></td></tr>
+<tr><td>3</td><td>환불·수업취소</td><td class="dir">파고다→픽클래스</td><td>PATCH</td><td><span class="badge done">구현 완료</span></td></tr>
+<tr><td>4</td><td>기간조정·서비스티켓</td><td class="dir">파고다→픽클래스</td><td>PATCH</td><td><span class="badge done">구현 완료</span></td></tr>
+<tr><td>5</td><td>기업 종료일 일괄변경</td><td class="dir">파고다→픽클래스</td><td>PATCH</td><td><span class="badge done">구현 완료</span></td></tr>
+<tr><td>6</td><td>설문·공지 등록</td><td class="dir">파고다→픽클래스</td><td>POST</td><td><span class="badge done">구현 완료</span></td></tr>
+<tr><td>7</td><td>로그인 인증</td><td class="dir">픽클래스→파고다</td><td>POST</td><td><span class="badge wait">엔드포인트 대기</span> 인증 후 학습자 자동 프로비저닝 로직 완료</td></tr>
+<tr><td>8</td><td>출석 완료</td><td class="dir">픽클래스→파고다</td><td>POST</td><td><span class="badge wait">엔드포인트 대기</span> 송신 파이프라인(아웃박스) 구현</td></tr>
+<tr><td>9</td><td>수료 완료</td><td class="dir">픽클래스→파고다</td><td>POST</td><td><span class="badge wait">엔드포인트 대기</span> 수료 AND/OR 판정 + 송신 구현</td></tr>
+<tr><td>10</td><td>레벨테스트·평가</td><td class="dir">픽클래스→파고다</td><td>POST</td><td><span class="badge wait">엔드포인트 대기</span></td></tr>
+</tbody>
+</table>
+<p><b>#1~6 수신은 실동작 검증까지 완료</b>했습니다. <b>#7~10 송신</b>은 로직·판정·송신 파이프라인을 구현했으나, <b>파고다 측 실제 엔드포인트·인증 정보가 명세상 “미정”</b>이라 대기 중입니다.</p>
+
+<h2>3. 픽클래스가 확정한 매핑 규칙</h2>
+<table>
+<thead><tr><th>항목</th><th>픽클래스 처리</th></tr></thead>
+<tbody>
+<tr><td><code>comCd</code></td><td>기업코드를 자립 앵커로 사용(픽클래스 기관과 별도 매핑 불요). 파고다 학습자는 단일 기관 “파고다 교육그룹”에 귀속</td></tr>
+<tr><td>수료 기준</td><td>#1/#2의 <code>comInfo.completion</code>(criteria·sentences·attendance) 그대로 사용. AND(<code>a&amp;b</code>)/OR(<code>a|b</code>) 조합 판정을 #9 송신 시 계산</td></tr>
+<tr><td>출석률(attendance)</td><td>진도율(차시 완료율)로 계산</td></tr>
+<tr><td>수업 횟수(<code>classCnt</code>)</td><td>부여 횟수로 저장, 소진은 레슨(차시) 완료 수로 집계</td></tr>
+</tbody>
+</table>
+
+<h2 style="color:#b45309;border-color:#fed7aa">4. 파고다 측 협의·제공 요청</h2>
+
+<div class="ask">
+<h3>A. #7~10 엔드포인트 및 인증 (최우선)</h3>
+<p>명세상 Request URI가 “미정”입니다. 아래를 확정해 주세요.</p>
+<ul>
+<li>#7(로그인)·#8(출석)·#9(수료)·#10(평가) 각각의 <b>운영/테스트 실제 URL</b></li>
+<li><b>인증 방식</b>(예: Authorization Bearer 토큰, <code>auth_secret</code> 등) 및 값 발급</li>
+<li>#7 응답의 <code>classStatus</code>·<code>classInfo(active/completed)</code> 반환 규격 재확인</li>
+</ul>
+</div>
+
+<div class="ask">
+<h3>B. processId / detailId ↔ 콘텐츠 대응</h3>
+<p>#1의 <code>processes[].detailIds</code>(예 <code>"Y2GK7B"</code>)는 <b>파고다 자체 콘텐츠 코드</b>로 확인됩니다. 픽클래스 과정/차시와 연결하려면 대응 관계가 필요합니다.</p>
+<ul>
+<li>파고다 <code>detailId</code>(및 <code>processId</code>) 코드 <b>목록과 그 의미</b>(어떤 과정/차시 단위인지)</li>
+<li>또는 파고다가 <b>픽클래스 콘텐츠 코드를 수용</b>해 동봉해 줄 수 있는지</li>
+<li>이 대응이 확정되어야 수강(classId)이 픽클래스 과정으로 연결되어 학습·수료 판정이 개통됩니다.</li>
+</ul>
+</div>
+
+<div class="ask">
+<h3>C. processId / detailId 그레인(단위) 확정</h3>
+<p>#1은 <code>process</code>(상위) → <code>details[]</code>(하위) 계층인데, #8·#9·#10 예시는 <code>processId</code>가 #1의 detail 레벨 코드(<code>R2GK7B</code>)로 표기되어 있습니다. 결과 송신 시 <b>어느 단위를 <code>processId</code>/<code>detailId</code>로 보내야 하는지</b> 확정 부탁드립니다.</p>
+</div>
+
+<div class="ask">
+<h3>D. 데이터 형식</h3>
+<ul>
+<li>일시(<code>bgnDttm</code>/<code>endDttm</code>) <b>타임존</b>(KST/UTC) 기준</li>
+<li>#10 응답 필드명 <code>recommand</code>(표) vs <code>recommend</code>(예시) 표기 확정</li>
+</ul>
+</div>
+
+<h2>5. 참고 — 수신(#1~6) 엔드포인트·인증</h2>
+<p><b>Base URL</b> — 라이브 <code>https://api.picklass.com</code> · 개발 <code>https://api-picklass-com.vercel.app</code> (경로 <code>/pagoda/*</code>). 파고다에서 #1~6 호출 시 이 주소로 전송합니다.</p>
+<p>현재 #1~6 수신은 <b>파트너 API Key(Authorization: Bearer)</b> 대조로 보호하고 있습니다. 파고다에서 호출 시 사용할 키 발급/교환 방식을 함께 협의하면 됩니다.</p>
+
+<div class="foot">
+본 문서는 픽클래스 내부 구현 현황 기준의 협의용 초안입니다. 회신 주시면 #7~10 실연동 및 콘텐츠 대응을 즉시 진행하겠습니다.
+</div>
+
+</body>
+</html>

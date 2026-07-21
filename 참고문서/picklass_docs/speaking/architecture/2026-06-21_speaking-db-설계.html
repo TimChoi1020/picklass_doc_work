@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking DB 설계서 (2026-06-21)</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171b2e; --panel2:#1e2440; --ink:#e8ecf6; --mut:#9aa3c0;
+    --line:#2c3454; --acc:#4f8cff; --green:#1f9d72; --amber:#d99326; --red:#d4537e;
+    --kpi-pron:#185FA5; --kpi-flu:#534AB7; --kpi-gram:#BA7517; --kpi-prag:#D4537E; --kpi-vol:#0F6E56;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",-apple-system,"Malgun Gothic",sans-serif;line-height:1.6;font-size:14px}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 96px}
+  h1{font-size:28px;margin:0 0 4px}
+  h2{font-size:21px;margin:46px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{font-size:16px;margin:26px 0 10px;color:#cdd6f4}
+  .sub{color:var(--mut);margin:0 0 24px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 28px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--mut)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 18px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:13px}
+  .dot{width:13px;height:13px;border-radius:3px;display:inline-block}
+  .d1{background:#39507a} .d2{background:var(--green)} .d3{background:var(--amber)} .d4{background:#6b4a8a}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0;overflow:hidden}
+  .card.exist{border-left:4px solid #39507a}
+  .card.extend{border-left:4px solid var(--amber)}
+  .card.new{border-left:4px solid var(--green)}
+  .card.frt{border-left:4px solid #6b4a8a}
+  .card h4{margin:0;padding:11px 14px;font-size:14.5px;background:var(--panel2);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .card h4 .tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .tag.exist{background:#26344f;color:#9db8e8} .tag.extend{background:#3d3216;color:#e6c07a}
+  .tag.new{background:#10402f;color:#6ee0b0} .tag.frt{background:#332247;color:#c9a7e8}
+  .cols{padding:8px 14px 12px;font-size:12.5px}
+  .cols .row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #232a45}
+  .cols .row:last-child{border-bottom:0}
+  .cols .nm{color:#dbe2f7;font-family:"Consolas",monospace}
+  .cols .ty{color:var(--mut);font-family:"Consolas",monospace;font-size:11.5px;text-align:right}
+  .pk{color:#ffd479} .fk{color:#7fd1ff}
+  .note{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:12px 16px;margin:14px 0}
+  .note.warn{border-left-color:var(--amber)} .note.bad{border-left-color:var(--red)}
+  .note b{color:#fff}
+  table.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.5px}
+  table.tbl th,table.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.tbl th{background:var(--panel2);color:#cdd6f4;font-weight:600}
+  table.tbl td code,code{background:#0c1020;border:1px solid #232a45;border-radius:4px;padding:1px 5px;font-family:Consolas,monospace;font-size:11.5px;color:#9fe0c0}
+  pre{background:#0b0e1c;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;font-size:12px;color:#c6d0ee;font-family:Consolas,monospace}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:16px 0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;flex:1;min-width:200px}
+  .box .t{font-weight:600;color:#fff;margin-bottom:6px;font-size:13px}
+  .box small{color:var(--mut)}
+  .arrow{display:flex;align-items:center;color:var(--acc);font-size:22px;font-weight:700}
+  .schema-band{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:6px;margin:18px 0 6px}
+  .band-public{background:#13243d;color:#8fc0ff;border:1px solid #244067}
+  .band-speaking{background:#2a1d3d;color:#cba7ee;border:1px solid #432f63}
+  .kpibar{display:flex;gap:4px;margin:8px 0}
+  .kpibar span{flex:1;text-align:center;color:#fff;font-size:11px;padding:5px 2px;border-radius:5px}
+  ul.tight{margin:8px 0;padding-left:20px} ul.tight li{margin:3px 0}
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 22px;columns:2;column-gap:30px}
+  .toc a{color:#a9c4ff;text-decoration:none;display:block;padding:2px 0;font-size:13px;break-inside:avoid}
+  .toc a:hover{text-decoration:underline}
+  a.anchor{color:inherit;text-decoration:none}
+  .small{font-size:12px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Speaking DB 테이블 설계서</h1>
+  <p class="sub">스피킹 전체 화면 · 개발 문서 · 공유 Supabase 실제 스키마(6개 저장소 + <code>speaking</code> 스키마 introspection) · module_questions 실데이터 샘플을 종합</p>
+  <div class="meta">
+    <span class="chip">작성일 2026-06-21</span>
+    <span class="chip">대상 speaking.picklass.com</span>
+    <span class="chip">DB Supabase PostgreSQL (tutoring·studio·backoffice 공유)</span>
+    <span class="chip">신규 사용자데이터: public 스키마 / manual-sql 거버넌스</span>
+  </div>
+
+  <div class="legend">
+    <span class="lg"><i class="dot d1"></i> 기존 (변경 없음)</span>
+    <span class="lg"><i class="dot d3"></i> 기존 + 컬럼 확장</span>
+    <span class="lg"><i class="dot d2"></i> 신규 (manual-sql)</span>
+    <span class="lg"><i class="dot d4"></i> speaking 스키마 (FRT 엔진 · 기존)</span>
+  </div>
+
+  <div class="toc">
+    <a href="#s0">0. 핵심 결론 — 두 스키마 / 두 거버넌스</a>
+    <a href="#s1">1. public 스키마 — 기존 테이블</a>
+    <a href="#s2">2. module_questions JSON 계약 (실데이터)</a>
+    <a href="#s3">3. speaking 스키마 — FRT 엔진 (기존)</a>
+    <a href="#s4">4. 신규 테이블 / 컬럼 확장</a>
+    <a href="#s5">5. cross-schema 발화량 집계</a>
+    <a href="#s6">6. KPI 코드 표준</a>
+    <a href="#s7">7. DDL (manual-sql)</a>
+    <a href="#s8">8. 미결정 · 정렬 필요 사항</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="s0"><a class="anchor" href="#s0">0. 핵심 결론 — 두 스키마 / 두 거버넌스</a></h2>
+  <p>Speaking은 <b>하나의 Supabase 인스턴스 안에서 두 개의 Postgres 스키마</b>를 사용한다. 둘은 네이밍 규칙도, 마이그레이션 거버넌스도 완전히 다르다.</p>
+  <table class="tbl">
+    <tr><th></th><th><code>public</code> 스키마</th><th><code>speaking</code> 스키마</th></tr>
+    <tr><td>역할</td><td>모듈 콘텐츠·커리큘럼·학습결과·사용자 (LRN~OMP 8모듈)</td><td><b>FRT(자유대화) 엔진</b> 실시간 세션·턴·평가·비용</td></tr>
+    <tr><td>소유</td><td>backoffice/tutoring/studio/speaking 공유</td><td>FRT 엔진 전용 (별도 서비스)</td></tr>
+    <tr><td>네이밍</td><td><code>snake_case</code>, PK <code>uuid</code>/<code>int</code></td><td><code>camelCase</code>, PK <code>text</code></td></tr>
+    <tr><td>마이그레이션</td><td><b>Prisma migrate 금지</b> → manual-sql (§15)</td><td><b>Prisma migrate 사용</b> (자체 <code>_prisma_migrations</code> 8건)</td></tr>
+    <tr><td>테이블 수</td><td>12 (speaking 관련)</td><td>6 (+migrations)</td></tr>
+  </table>
+  <div class="note warn"><b>설계 영향:</b> FRT는 신규 설계 대상이 아니다(이미 운영 중 — SessionReport 212건). 그러나 "전 모듈 통합 발화량 챌린지"는 <b>두 스키마를 가로질러 집계</b>해야 한다(§5). 신규 사용자데이터 테이블(표현노트·학습설정·알림)은 사용자 결정에 따라 <b>public 스키마 + manual-sql</b>로 둔다.</div>
+
+  <!-- ============================================================ -->
+  <h2 id="s1"><a class="anchor" href="#s1">1. public 스키마 — 기존 테이블 (변경 없음)</a></h2>
+  <span class="schema-band band-public">SCHEMA: public</span>
+  <div class="grid">
+
+    <div class="card exist"><h4>users <span class="tag exist">공유·확장</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">institution_id</span><span class="ty">uuid?</span></div>
+      <div class="row"><span class="nm">role_code / status_code</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">user_id / password_hash</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">name / email / phone</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm" style="color:#e6c07a">+ notification_settings</span><span class="ty">jsonb (신규)</span></div>
+    </div></div>
+
+    <div class="card exist"><h4>texts <span class="tag exist">콘텐츠·읽기</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">int PK</span></div>
+      <div class="row"><span class="nm">title / content / level</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">category / topic / word_count</span><span class="ty">text/int</span></div>
+      <div class="row"><span class="nm">core_expressions</span><span class="ty">jsonb ✅</span></div>
+      <div class="row"><span class="nm">core_dialog</span><span class="ty">jsonb ✅</span></div>
+      <div class="row"><span class="nm">speaking_content</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">speaking_generated_at</span><span class="ty">timestamptz</span></div>
+      <div class="row"><span class="nm">speaking_prompt_code</span><span class="ty">varchar(30)</span></div>
+    </div></div>
+
+    <div class="card exist"><h4>course_lessons <span class="tag exist">커리큘럼</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">course_id</span><span class="ty">uuid</span></div>
+      <div class="row"><span class="nm fk">text_id</span><span class="ty">int?</span></div>
+      <div class="row"><span class="nm">lesson_order / topic</span><span class="ty">int/text</span></div>
+      <div class="row"><span class="nm">skill_modules</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">status_code</span><span class="ty">varchar</span></div>
+    </div></div>
+
+    <div class="card exist"><h4>courses <span class="tag exist">커리큘럼</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">institution_id</span><span class="ty">uuid</span></div>
+      <div class="row"><span class="nm">title / level_code / genre_code</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">status_code / total_lessons</span><span class="ty">varchar/int</span></div>
+      <div class="small" style="margin-top:6px">나만의 수업: genre_code='personal' / FRT 커스텀: genre_code='custom'</div>
+    </div></div>
+
+    <div class="card exist"><h4>ai_modules <span class="tag exist">모듈 시퀀싱</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm">code / name / skill</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">class_before/middle/after</span><span class="ty">bool</span></div>
+      <div class="row"><span class="nm">priority / prerequisites[]</span><span class="ty">int/text[]</span></div>
+      <div class="row"><span class="nm">question_generation_strategy</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">content_generation_instruction</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">selected_kpi_codes[]</span><span class="ty">text[]</span></div>
+      <div class="small" style="margin-top:6px">9모듈 등록완료: LRN·VLM·SHD·SFB·SMK·RPB·RPF·OMP·FRT</div>
+    </div></div>
+
+    <div class="card exist"><h4>module_questions <span class="tag exist">문항 캐시</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">module_id / text_id</span><span class="ty">uuid/int</span></div>
+      <div class="row"><span class="nm">question_number / type</span><span class="ty">int/varchar</span></div>
+      <div class="row"><span class="nm">instruction / text</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">options</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">answer</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">hints</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">source</span><span class="ty">text</span></div>
+      <div class="small" style="margin-top:6px">→ JSON 계약은 §2 (실데이터 기준)</div>
+    </div></div>
+
+    <div class="card exist"><h4>module_histories <span class="tag exist">학습 이력</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">course_lesson_id</span><span class="ty">uuid</span></div>
+      <div class="row"><span class="nm">student_id / module_code</span><span class="ty">uuid/varchar</span></div>
+      <div class="row"><span class="nm">answers / chat_messages</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">score</span><span class="ty">int</span></div>
+      <div class="row"><span class="nm">kpis</span><span class="ty">jsonb ★</span></div>
+      <div class="row"><span class="nm">started_at / completed_at</span><span class="ty">timestamptz</span></div>
+    </div></div>
+
+    <div class="card exist"><h4>lesson_results <span class="tag exist">레슨 결산</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">course_lesson_id</span><span class="ty">uuid</span></div>
+      <div class="row"><span class="nm">student_id / average_score</span><span class="ty">uuid/decimal</span></div>
+      <div class="row"><span class="nm">module_results / total_duration</span><span class="ty">jsonb/int</span></div>
+      <div class="row"><span class="nm">completed_at</span><span class="ty">timestamptz</span></div>
+    </div></div>
+
+    <div class="card exist"><h4>speaking_passage_prompts <span class="tag exist">프롬프트</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm">code</span><span class="ty">varchar(30) uniq</span></div>
+      <div class="row"><span class="nm">name / description / prompt</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">status</span><span class="ty">varchar</span></div>
+      <div class="small" style="margin-top:6px">code: 'core-expressions', 'core-dialog'</div>
+    </div></div>
+
+    <div class="card exist"><h4>text_analyses · external_access_tokens · code_groups/items <span class="tag exist">기타</span></h4><div class="cols">
+      <div class="row"><span class="nm">text_analyses</span><span class="ty">분석기 결과</span></div>
+      <div class="row"><span class="nm">external_access_tokens</span><span class="ty">핸드오프</span></div>
+      <div class="row"><span class="nm">code_groups / code_items</span><span class="ty">공통코드·KPI</span></div>
+      <div class="row"><span class="nm fk">institutions</span><span class="ty">공유(backoffice)</span></div>
+      <div class="row"><span class="nm fk">access_codes</span><span class="ty">공유(수강계약)</span></div>
+    </div></div>
+
+  </div>
+
+  <div class="note"><b>texts.core_expressions / core_dialog 구조</b> (studio·backoffice 스키마 + 2026-06-16 manual-sql 확인):</div>
+  <pre>// core_expressions — LRN→SHD→SFB→SMK→RPF 공유 (개수: A1~A2=3, B1~B2=4, C1~C2=5)
+[{ "seq":1, "sentence":"...", "translation":"...", "expression":"make a reservation",
+   "expression_meaning":"예약하다", "blank_version":"I'd like to ___ at ...", "blank_answer":"make a reservation" }]
+
+// core_dialog — RPB(전체)·RPF(맥락) 공유 (턴수: A1=6, A2=8, B1~B2=10, C1~C2=12)
+{ "topic":"호텔 체크인", "situation":"...", "turns":[{ "role":"guest", "line":"...", "translation":"...", "is_mission":true }] }</pre>
+
+  <!-- ============================================================ -->
+  <h2 id="s2"><a class="anchor" href="#s2">2. module_questions JSON 계약 — 실데이터 기준</a></h2>
+  <p>엑셀 <code>스피킹모듈 데이터 샘플_최종.xlsx</code>(운영 데이터 21행)에서 추출한 <b>정본 계약</b>이다. <code>type</code>은 추측했던 세분 코드가 아니라 실제로는 <b>2종</b>이며, <code>options/answer/hints/source</code>는 모듈별로 JSON·문자열·null을 혼용한다.</p>
+  <table class="tbl">
+    <tr><th>모듈</th><th>type</th><th>options</th><th>answer</th><th>hints</th><th>source</th></tr>
+    <tr><td><b>LRN</b></td><td><code>audio-listen</code></td><td><code>{expressionList[],readCompletionThreshold}</code></td><td>null</td><td>null</td><td>null</td></tr>
+    <tr><td><b>VLM</b></td><td><code>audio-listen</code></td><td><code>{word,sampleEn,sampleKr,meaningKr}</code></td><td>null</td><td>null</td><td>null</td></tr>
+    <tr><td><b>SHD</b></td><td><code>audio-record</code></td><td><code>{meaningKr}</code></td><td><code>{sentence,asrThreshold,phoneticGuide,pronunciationPoints[],passSpeeds[]}</code></td><td>null</td><td>null</td></tr>
+    <tr><td><b>SFB</b></td><td><code>audio-record</code></td><td><code>{meaningKr}</code></td><td><code>{fullSentence,blankAnswer,asrThreshold,pronunciationPoints[]}</code></td><td>표현 문자열</td><td>완성문장</td></tr>
+    <tr><td><b>SMK</b></td><td><code>audio-record</code></td><td>모범영문 <b>문자열</b></td><td><code>{targetExpression,modelEnglish,alternativeAnswers[],evalCriteria,exprApropThreshold}</code></td><td><code>{button,direct}</code></td><td>null</td></tr>
+    <tr><td><b>RPB</b></td><td><code>audio-record</code></td><td><code>{dialogue:[{en,role,turnNo,speaker,meaningKr}]}</code></td><td><code>{learnerTargetLines[],missionExpressions[],asrThreshold}</code></td><td>null</td><td><code>{scenario,persona{name,role,tone}}</code></td></tr>
+    <tr><td><b>RPF</b></td><td><code>audio-record</code></td><td><code>{branchPool[],missionChecklist[]}</code></td><td><code>{missionExpressions[],interactionActCriteria,missionUsageThreshold}</code></td><td>null</td><td><code>{scenario,persona}</code></td></tr>
+    <tr><td><b>OMP</b></td><td><code>audio-record</code></td><td><code>{topicEn,topicKr,description}</code></td><td><code>{topic,keywords[],memoTemplate[],modelKeyPoints[],evalRubric,prepSeconds,speakSeconds}</code></td><td>null</td><td>null</td></tr>
+  </table>
+  <div class="note warn"><b>설계 결론:</b> module_questions는 <b>스키마 변경 불필요</b>. 단 위 계약을 <code>packages/types</code>에 모듈별 판별 유니온 타입으로 고정해야 하며, <code>speaker</code> 값은 <code>persona|learner</code>, <code>passSpeeds</code>는 <code>[1,1.2,1.3]</code> 고정이다. <code>options</code>가 JSONB이지만 SMK는 문자열을 저장하므로 파서가 두 형태를 모두 처리해야 한다.</div>
+
+  <!-- ============================================================ -->
+  <h2 id="s3"><a class="anchor" href="#s3">3. speaking 스키마 — FRT 자유대화 엔진 (기존 · 변경 없음)</a></h2>
+  <span class="schema-band band-speaking">SCHEMA: speaking &nbsp;·&nbsp; Prisma migrate 관리 &nbsp;·&nbsp; camelCase / text PK</span>
+  <div class="grid">
+    <div class="card frt"><h4>Session <span class="tag frt">328행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm">userId</span><span class="ty">text → users.id*</span></div>
+      <div class="row"><span class="nm">config</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">levelGroupId / wpm</span><span class="ty">text/int</span></div>
+      <div class="row"><span class="nm">status / totalTokensUsed</span><span class="ty">text/float</span></div>
+      <div class="row"><span class="nm">createdAt/updatedAt/deletedAt</span><span class="ty">timestamp</span></div>
+    </div></div>
+    <div class="card frt"><h4>Turn <span class="tag frt">1,758행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm fk">sessionId</span><span class="ty">→ Session.id</span></div>
+      <div class="row"><span class="nm">seq</span><span class="ty">int</span></div>
+      <div class="row"><span class="nm">userText / aiText</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">silenceTimeout</span><span class="ty">bool</span></div>
+      <div class="row"><span class="nm">sessionPhase</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">aiInvitedQuestion</span><span class="ty">bool</span></div>
+    </div></div>
+    <div class="card frt"><h4>TurnEvaluation <span class="tag frt">1,164행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm fk">turnId</span><span class="ty">→ Turn.id</span></div>
+      <div class="row"><span class="nm">wordCount / charCount / durationMs</span><span class="ty">int</span></div>
+      <div class="row"><span class="nm">pronAccuracy/Fluency/Completeness/Prosody</span><span class="ty">float</span></div>
+      <div class="row"><span class="nm">pragRelevance / pragContext</span><span class="ty">float</span></div>
+      <div class="row"><span class="nm">grammarErrors</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">hints / correction* / repeat*</span><span class="ty">jsonb/text</span></div>
+    </div></div>
+    <div class="card frt"><h4>TurnCost <span class="tag frt">1,757행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm fk">turnId</span><span class="ty">→ Turn.id</span></div>
+      <div class="row"><span class="nm">stt/llm/tts Tokens·Model</span><span class="ty">float/text</span></div>
+      <div class="row"><span class="nm">totalTokens</span><span class="ty">float</span></div>
+    </div></div>
+    <div class="card frt"><h4>AudioFile <span class="tag frt">3,111행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm fk">turnId</span><span class="ty">→ Turn.id</span></div>
+      <div class="row"><span class="nm">kind / format</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">s3Bucket / s3Key</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">sizeBytes / durationMs</span><span class="ty">int</span></div>
+    </div></div>
+    <div class="card frt"><h4>SessionReport <span class="tag frt">212행</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">text PK</span></div>
+      <div class="row"><span class="nm fk">sessionId</span><span class="ty">→ Session.id</span></div>
+      <div class="row"><span class="nm">durationMinutes / overallScore</span><span class="ty">float/int</span></div>
+      <div class="row"><span class="nm">uv·pron·wcpm·prag·gram Score</span><span class="ty">int (5축)</span></div>
+      <div class="row"><span class="nm">summaryFeedback</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">strengths/improvements/nextSteps</span><span class="ty">text[]</span></div>
+      <div class="row"><span class="nm">detailMetrics</span><span class="ty">jsonb</span></div>
+    </div></div>
+  </div>
+  <p class="small">* <b>[2026-06-21 실측]</b> <code>userId</code>(text)는 <code>public.users.id</code>(UUID)가 <b>아니다</b> — 이메일/닉네임/<code>authCode</code> 기반의 <b>독립 식별 체계</b>. 328건 전부 비-UUID 테스터 데이터이며 users 매핑 0건. FRT 엔진은 현재 앱 사용자 식별과 연동돼 있지 않다. → dual-write 시 <code>utterance_logs.user_id</code>는 <b>앱이 보유한 진짜 UUID</b>(req.user.id)로 채우고, 세션 지표는 앱이 발급/보관한 <code>session_ref</code>로 읽는다.</p>
+  <div class="note bad"><b>거버넌스 주의:</b> 이 스키마는 자체 <code>_prisma_migrations</code>로 Prisma migrate가 적용되어 있다. public 스키마의 "migrate 금지" 정책과 <b>충돌하므로 절대 통합 운영하지 말 것</b>. speaking 스키마 변경은 FRT 엔진 소유 팀/저장소에서만 수행한다.</div>
+
+  <!-- ============================================================ -->
+  <h2 id="s4"><a class="anchor" href="#s4">4. 신규 테이블 / 컬럼 확장 (public 스키마 · manual-sql)</a></h2>
+  <p>스피킹 개발 문서가 <b>명시한 신규 항목</b>만 설계한다. 모두 <code>public</code> 스키마에 두고 §15 manual-sql 거버넌스로 적용한다.</p>
+  <span class="schema-band band-public">SCHEMA: public &nbsp;·&nbsp; manual-sql</span>
+  <div class="grid">
+
+    <div class="card extend"><h4>users + notification_settings <span class="tag extend">컬럼확장</span></h4><div class="cols">
+      <div class="row"><span class="nm">push{9종 토글}</span><span class="ty">jsonb</span></div>
+      <div class="row"><span class="nm">dnd_start / dnd_end</span><span class="ty">"22:00"</span></div>
+      <div class="row"><span class="nm">kakao/email/marketing_opt_in</span><span class="ty">bool</span></div>
+      <div class="small" style="margin-top:6px">마스터플랜 §4.5 · 공유 테이블 → 사전 정렬</div>
+    </div></div>
+
+    <div class="card new"><h4>user_learning_profiles <span class="tag new">신규</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">user_id</span><span class="ty">uuid PK→users</span></div>
+      <div class="row"><span class="nm">cefr_level / learning_goal</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">exam_target / job_role</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">interests[]</span><span class="ty">text[]</span></div>
+      <div class="row"><span class="nm">persona_code / preferred_mode</span><span class="ty">varchar</span></div>
+      <div class="row"><span class="nm">daily_goal_min / speed_default</span><span class="ty">int/numeric</span></div>
+      <div class="small" style="margin-top:6px">§4.3 그룹3 · 개인화/페르소나 컨텍스트</div>
+    </div></div>
+
+    <div class="card new"><h4>user_expressions <span class="tag new">신규</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">user_id</span><span class="ty">uuid→users</span></div>
+      <div class="row"><span class="nm">expression / meaning</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">source / source_lesson_id</span><span class="ty">varchar/uuid?</span></div>
+      <div class="row"><span class="nm">level / review_count</span><span class="ty">int</span></div>
+      <div class="row"><span class="nm">last_reviewed_at / next_review_at</span><span class="ty">timestamptz</span></div>
+      <div class="small" style="margin-top:6px">§4.6 망각곡선 · §4.7 표현카드 (uniq user_id+expression)</div>
+    </div></div>
+
+    <div class="card new"><h4>user_personal_courses <span class="tag new">신규</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">user_id</span><span class="ty">uuid PK→users</span></div>
+      <div class="row"><span class="nm fk">course_id</span><span class="ty">uuid→courses</span></div>
+      <div class="row"><span class="nm">created_at</span><span class="ty">timestamptz</span></div>
+      <div class="small" style="margin-top:6px">§9.2 나만의 수업 1:1</div>
+    </div></div>
+
+    <div class="card new"><h4>institution_brands <span class="tag new">신규</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">institution_id</span><span class="ty">uuid uniq→institutions</span></div>
+      <div class="row"><span class="nm">logo_url / logo_dark_url</span><span class="ty">text</span></div>
+      <div class="row"><span class="nm">primary_hex / skin_code</span><span class="ty">char(7)/text</span></div>
+      <div class="row"><span class="nm">app_name / app_domain</span><span class="ty">text (Tier3)</span></div>
+      <div class="small" style="margin-top:6px">§5.1 · 5축 KPI 색상은 저장 금지</div>
+    </div></div>
+
+    <div class="card exist"><h4>수료조건 / 프로그램 <span class="tag exist">backoffice 읽기</span></h4><div class="cols">
+      <div class="row"><span class="nm">수료조건</span><span class="ty">institution_settings.default_completion_*</span></div>
+      <div class="row"><span class="nm">수강·기간</span><span class="ty">access_codes.usage_*_date</span></div>
+      <div class="row"><span class="nm">현재 달성값</span><span class="ty">utterance_logs + lesson_results</span></div>
+      <div class="row"><span class="nm">일일목표</span><span class="ty">user_learning_profiles.daily_goal_min</span></div>
+      <div class="small" style="margin-top:6px">권장안: speaking 신규 테이블 없음 · backoffice 단일 소스 READ</div>
+    </div></div>
+
+    <div class="card new"><h4>utterance_logs <span class="tag new">신규·권장</span></h4><div class="cols">
+      <div class="row"><span class="nm pk">id</span><span class="ty">uuid PK</span></div>
+      <div class="row"><span class="nm fk">user_id</span><span class="ty">uuid→users</span></div>
+      <div class="row"><span class="nm">source_module</span><span class="ty">varchar(10)</span></div>
+      <div class="row"><span class="nm">session_ref</span><span class="ty">text (추적)</span></div>
+      <div class="row"><span class="nm">sentence_count / word_count</span><span class="ty">int</span></div>
+      <div class="row"><span class="nm">tap_mode / topic</span><span class="ty">bool/varchar</span></div>
+      <div class="row"><span class="nm">occurred_at</span><span class="ty">timestamptz</span></div>
+      <div class="small" style="margin-top:6px">§5 발화량 통합 싱크 · dual-write · idx(user_id, occurred_at)</div>
+    </div></div>
+
+  </div>
+  <div class="note"><b>GET /config/program 응답의 completion_rules</b>(저장 테이블 아님 — backoffice 값에서 조립) = <code>[{type,target,current,unit,label}]</code>, type ∈ <code>utterance_sentences | utterance_words | course_completion_pct | lesson_count | study_days</code>. target은 backoffice <code>institution_settings.default_completion_*</code>에서, current는 <code>utterance_logs</code>/<code>lesson_results</code> 계산에서 채운다.</div>
+
+  <!-- ============================================================ -->
+  <h2 id="s5"><a class="anchor" href="#s5">5. 발화량 통합 집계 — 재검토 (2026-06-21 실측 반영)</a></h2>
+  <div class="note bad"><b>실측으로 전제가 뒤집힘:</b> ① <code>public.module_histories</code>는 63행뿐이고 전부 <b>리딩 모듈</b>(CLR·PRD…) — 스피킹 모듈·FRT 행 0. ② <code>kpis</code>는 전부 <b>array</b>라 마스터플랜이 가정한 <code>kpis.sentence_count</code> 객체 접근이 불가능. ③ <code>saveModuleHistory()</code>는 <code>kpis</code>를 아예 쓰지 않음. → <b>발화량 통합 집계는 현재 미구현 greenfield</b>이며, 마이그레이션할 기존 로직이 없다.</div>
+  <p><b>cross-schema 비용 재평가:</b> 두 스키마는 같은 Postgres 인스턴스라 federation 비용이 없고, 발화량 쿼리는 사용자·기간 한정이라 인덱스만 있으면 저렴하다. 진짜 리스크는 DB 비용이 아니라 <b>핫 read 경로가 "임시" speaking 스키마에 결합</b>되는 것 + Prisma가 그 스키마를 네이티브로 못 읽는 점이다.</p>
+
+  <h3>권장 안 — C: 전용 싱크 <code>public.utterance_logs</code>에 동시기록(dual-write)</h3>
+  <div class="flow">
+    <div class="box"><div class="t">8모듈 완료</div><small>saveModuleHistory() 확장<br>sentence/word count insert</small></div>
+    <div class="arrow">↘</div>
+    <div class="box" style="border-color:#10402f;flex:1.3"><div class="t" style="color:#6ee0b0">public.utterance_logs (신규 싱크)</div><small>user_id · source_module · sentence_count · word_count · tap_mode · topic · occurred_at<br>idx(user_id, occurred_at)</small></div>
+    <div class="arrow">↗</div>
+    <div class="box" style="border-color:#432f63"><div class="t" style="color:#cba7ee">FRT 세션종료</div><small>speaking.Session/Turn rollup<br>1행 dual-write (topic=config.topic)</small></div>
+  </div>
+  <div class="flow">
+    <div class="box" style="border-color:#244067;flex:1"><div class="t" style="color:#8fc0ff">GET /challenge/utterance</div><small><b>단일 테이블 인덱스 1회 — cross-schema 0</b><br>daily 30 · weekly 200 · monthly 800 · persona 50</small></div>
+  </div>
+  <table class="tbl">
+    <tr><th>안</th><th>read 비용</th><th>임시 스키마 결합</th><th>마이그레이션 위험</th><th>판정</th></tr>
+    <tr><td>A. speaking 그대로 + read UNION</td><td>낮음(Session.userId 인덱스 추가 필요)</td><td>핫 경로 결합 ❌</td><td>없음</td><td>임시방편</td></tr>
+    <tr><td>B. speaking→public 전면 이관</td><td>낮음</td><td>제거</td><td><b>높음</b>(라이브 엔진 이관)</td><td>비권장(현시점)</td></tr>
+    <tr><td><b>C. utterance_logs 동시기록</b></td><td><b>가장 낮음(단일)</b></td><td><b>read 완전 분리</b> ✅</td><td>없음</td><td><b>권장</b></td></tr>
+  </table>
+  <table class="tbl">
+    <tr><th>수료조건/챌린지</th><th>단일 소스: public.utterance_logs (dual-write 후)</th></tr>
+    <tr><td>utterance_sentences</td><td><code>sum(sentence_count)</code> — 탭모드 ×0.6</td></tr>
+    <tr><td>utterance_words</td><td><code>sum(word_count)</code></td></tr>
+    <tr><td>페르소나 미터(토픽)</td><td><code>group by topic</code> (FRT는 Session.config.topic을 적재 시 복제)</td></tr>
+    <tr><td>course_completion_pct / lesson_count / study_days</td><td><code>lesson_results</code> (기존, 변경 없음)</td></tr>
+  </table>
+  <p class="small">기존 328개 FRT 세션은 <code>INSERT…SELECT</code> 1회 백필(DDL 주석 참조). FRT 엔진(speaking 스키마)을 직접 수정 못 하면, 앱의 FRT 완료 핸들러가 speaking에서 rollup을 읽어 utterance_logs에 1행 기록하는 방식도 가능.</p>
+
+  <h3>speaking 스키마 삭제 내구성 — "둘 다 대비" (2026-06-21 결정)</h3>
+  <div class="note"><b>C안은 speaking 스키마 삭제와 무관하게 발화량 집계가 보존되도록 설계됨.</b> <code>utterance_logs</code>는 speaking 스키마로의 <b>FK가 없고</b>(<code>session_ref</code>는 추적용 text), 데이터는 복제 적재되므로 read 경로가 speaking에 의존하지 않는다.</div>
+  <table class="tbl">
+    <tr><th>대상</th><th>speaking 스키마 삭제 시</th></tr>
+    <tr><td>발화량 챌린지(utterance_logs read) · 과거 누적치</td><td>✅ 영향 없음 (이미 public 복제·FK 없음)</td></tr>
+    <tr><td>FRT 학습 기능 자체 · 턴별 상세 리포트</td><td>❌ 중단/소실 — Session/Turn/평가가 speaking 스키마에 존재</td></tr>
+  </table>
+  <ul class="tight">
+    <li><b>백필 해당 없음 (2026-06-21 실측):</b> 기존 328 세션은 전부 비-UUID 테스터 데이터(users 매핑 0) → 보존할 실사용자 발화량이 없어 백필 미실행. "오늘 삭제해도 손실 0"이 이미 참.</li>
+    <li><b>전제(필수 정리):</b> FRT 엔진은 <code>users.id</code>가 아닌 자체 식별(이메일/닉네임/authCode) 사용. dual-write가 성립하려면 <b>앱이 FRT 세션을 launch할 때 자기 UUID와 session_ref(Session.id)를 연결·보관</b>해야 함 → 구현 1순위 통합점.</li>
+    <li><b>미래 A (FRT 저장소만 교체):</b> 상세 데이터 public 이전은 그때 별도 추가. <code>utterance_logs</code> 집계 계약 불변 → 재작업 없음.</li>
+    <li><b>미래 B (FRT 폐기/대체):</b> 추가 작업 없음. 누적 발화량은 utterance_logs에 남음.</li>
+    <li><b>추상화 핵심:</b> 발화 원천이 바뀌어도 write 훅의 <b>소스만 교체</b>, read/집계(<code>source_module</code>+<code>session_ref</code>)는 그대로.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="s6"><a class="anchor" href="#s6">6. KPI 코드 표준 (code_items: KPI_CATEGORY)</a></h2>
+  <p>5축은 프론트 표시 영역이며, 실제 측정 코드는 <code>code_items</code>의 <code>KPI_CATEGORY</code> 그룹(17개)을 참조한다. <code>ai_modules.selected_kpi_codes[]</code>에 모듈별로 저장(2026-06-08 확정).</p>
+  <div class="kpibar">
+    <span style="background:var(--kpi-pron)">발음 PRONUN_ACCURACY·PROSODY_PATTERN</span>
+    <span style="background:var(--kpi-flu)">유창 SPEAKING_RATE·SILENCE·LATENCY</span>
+    <span style="background:var(--kpi-gram)">문법 GRAMMAR_ERROR·EXPRESSION_APPROP</span>
+    <span style="background:var(--kpi-prag)">화용 INTERACTION_ACT</span>
+    <span style="background:var(--kpi-vol)">발화량 MLU_LENGTH·TOTAL_UTTERANCE</span>
+  </div>
+  <table class="tbl">
+    <tr><th>모듈</th><th>selected_kpi_codes</th></tr>
+    <tr><td>LRN / VLM</td><td><code>LISTEN_COMPLETE</code> / <code>VOCAB_RECOG</code></td></tr>
+    <tr><td>SHD</td><td>SPEAKING_RATE, PRONUN_ACCURACY, PROSODY_PATTERN</td></tr>
+    <tr><td>SFB / SMK</td><td>SPEAKING_RATE, EXPRESSION_COM, PRONUN_ACCURACY, PROSODY_PATTERN</td></tr>
+    <tr><td>RPB</td><td>MLU_LENGTH, RESPONSE_LATENCY, SPEAKING_RATE, PRONUN_ACCURACY, PROSODY_PATTERN</td></tr>
+    <tr><td>RPF</td><td>MLU_LENGTH, TOTAL_UTTERANCE, INTERACTION_ACT, RESPONSE_LATENCY, SPEAKING_RATE, GRAMMAR_ERROR, EXPRESSION_COM, PRONUN_ACCURACY</td></tr>
+    <tr><td>OMP</td><td>MLU_LENGTH, TOTAL_UTTERANCE, PRESENT_FLUENCY, PRESENT_CONTENT, PRESENT_STRUCT, GRAMMAR_ERROR, EXPRESSION_APPROP</td></tr>
+    <tr><td>FRT</td><td>MLU_LENGTH, TOTAL_UTTERANCE, INTERACTION_ACT, SPEAKING_RATE, GRAMMAR_ERROR, EXPRESSION_APPROP, PRONUN_ACCURACY</td></tr>
+  </table>
+  <div class="note warn"><code>LISTEN_COMPLETE</code>, <code>EXPRESSION_COM</code> 2개는 사용 중이나 <code>kpi-catalog.md</code> 미등록 → 카탈로그 추가 필요.</div>
+
+  <!-- ============================================================ -->
+  <h2 id="s7"><a class="anchor" href="#s7">7. DDL — manual-sql (실행 산출물)</a></h2>
+  <p class="small">실행 파일: <code>speaking.picklass.com/apps/api/prisma/manual-sql/2026-06-21_speaking-user-data-tables.sql</code><br>
+  적용: 백업(pg_dump) → Supabase 직접 실행 → <code>prisma:pull</code> → <code>build</code> → API 재시작 (§15.3)</p>
+  <pre>BEGIN;
+
+-- 0) 공유 users 컬럼 확장 — 알림 설정 (§4.5) · backoffice/tutoring 사전 정렬
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS notification_settings JSONB DEFAULT '{
+  "push":{"mission":true,"streak":true,"challenge":true,"intimacy":true,"omp_reminder":true,
+          "utterance":true,"character":true,"admin":true,"return":true},
+  "dnd_start":"22:00","dnd_end":"08:00",
+  "kakao_opt_in":false,"email_opt_in":false,"marketing_opt_in":false }'::jsonb;
+
+-- 1) 학습 설정·페르소나 (§4.3)
+CREATE TABLE IF NOT EXISTS public.user_learning_profiles (
+  user_id UUID PRIMARY KEY REFERENCES public.users(id),
+  cefr_level VARCHAR(10), learning_goal VARCHAR(50), exam_target VARCHAR(50),
+  job_role VARCHAR(100), interests TEXT[] NOT NULL DEFAULT '{}',
+  persona_code VARCHAR(20), daily_goal_min INTEGER NOT NULL DEFAULT 20,
+  preferred_mode VARCHAR(20), subtitle_default BOOLEAN NOT NULL DEFAULT true,
+  speed_default NUMERIC(3,1) NOT NULL DEFAULT 1.0, study_started_at DATE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+
+-- 2) 표현노트 / 망각곡선 / 표현카드 (§4.6·§4.7)
+CREATE TABLE IF NOT EXISTS public.user_expressions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id),
+  expression TEXT NOT NULL, meaning TEXT, example_sentence TEXT, category VARCHAR(50),
+  source VARCHAR(20) NOT NULL DEFAULT 'note',
+  source_lesson_id UUID REFERENCES public.course_lessons(id),
+  level INTEGER NOT NULL DEFAULT 0, review_count INTEGER NOT NULL DEFAULT 0,
+  last_reviewed_at TIMESTAMPTZ, next_review_at TIMESTAMPTZ,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, expression));
+CREATE INDEX IF NOT EXISTS idx_user_expr_user  ON public.user_expressions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_expr_next  ON public.user_expressions(user_id, next_review_at);
+CREATE INDEX IF NOT EXISTS idx_user_expr_level ON public.user_expressions(user_id, level);
+
+-- 3) 나만의 수업 1:1 (§9.2)
+CREATE TABLE IF NOT EXISTS public.user_personal_courses (
+  user_id UUID PRIMARY KEY REFERENCES public.users(id),
+  course_id UUID NOT NULL REFERENCES public.courses(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+
+-- 4) 기관 브랜딩 (§5.1)
+CREATE TABLE IF NOT EXISTS public.institution_brands (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  institution_id UUID NOT NULL UNIQUE REFERENCES public.institutions(id),
+  logo_url TEXT, logo_dark_url TEXT, primary_hex CHAR(7),
+  skin_code TEXT NOT NULL DEFAULT 'default', app_name TEXT, app_domain TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+
+-- 5) 동적 수료조건 (§12)
+CREATE TABLE IF NOT EXISTS public.program_configs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  institution_id UUID NOT NULL REFERENCES public.institutions(id),
+  product_code TEXT, program_name TEXT NOT NULL,
+  completion_rules JSONB NOT NULL DEFAULT '[]'::jsonb,
+  daily_goal_minutes INTEGER NOT NULL DEFAULT 20, start_date DATE, end_date DATE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS idx_program_configs_institution ON public.program_configs(institution_id);
+
+-- 6) 프로그램 등록 (§12)
+CREATE TABLE IF NOT EXISTS public.user_program_enrollments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id),
+  program_config_id UUID NOT NULL REFERENCES public.program_configs(id),
+  enrolled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, program_config_id));
+CREATE INDEX IF NOT EXISTS idx_enrollments_user ON public.user_program_enrollments(user_id);
+
+COMMIT;</pre>
+
+  <!-- ============================================================ -->
+  <h2 id="s8"><a class="anchor" href="#s8">8. 미결정 · 정렬 필요 사항</a></h2>
+  <table class="tbl">
+    <tr><th>#</th><th>항목</th><th>내용 / 권장</th><th>주체</th></tr>
+    <tr><td>1</td><td>공유 users 변경</td><td>✅ <b>승인(2026-06-21)</b> — <code>notification_settings</code> 추가 진행. backoffice·tutoring 통지 후 적용</td><td>3팀</td></tr>
+    <tr><td>2</td><td>backoffice 중복</td><td>✅ <b>권장안 채택(2026-06-21)</b> — 수료조건·프로그램은 speaking 신규 테이블 만들지 않고 backoffice 단일 소스 READ(<code>institution_settings.default_completion_*</code>, <code>access_codes.usage_*</code>). <code>program_configs</code>/<code>user_program_enrollments</code> <b>폐기</b>. 브랜딩(<code>institution_brands</code>)만 신규 유지</td><td>speaking</td></tr>
+    <tr><td>3</td><td>발화량 집계</td><td>✅ <b>C안 채택(2026-06-21)</b> — utterance_logs 동시기록 + 기존 328세션 백필. read 단일 테이블, cross-schema 0</td><td>speaking</td></tr>
+    <tr><td>4</td><td>FRT dual-write 주체</td><td>✅ <b>권장안 채택</b> — 앱 FRT 완료 핸들러가 utterance_logs에 기록(임시 FRT 엔진 무수정). <b>[실측] Session.userId는 users.id 아님(이메일/닉네임)</b> → 앱 UUID로 기록하고 session_ref로 지표 읽기. 앱이 launch 시 UUID↔session_ref 연결 보관이 <b>구현 1순위</b></td><td>speaking</td></tr>
+    <tr><td>5</td><td>FRT 엔진 소유</td><td>speaking 스키마는 별도 Prisma migrate 관리 → 변경 권한·저장소 위치 확인</td><td>speaking/FRT</td></tr>
+    <tr><td>6</td><td>KPI 카탈로그</td><td><code>LISTEN_COMPLETE</code>·<code>EXPRESSION_COM</code> code_items 미등록 → 추가</td><td>backoffice</td></tr>
+  </table>
+
+  <p class="small" style="margin-top:40px;border-top:1px solid var(--line);padding-top:16px">
+    근거 자료: speaking·shared 문서(picklass_docs), tutoring/studio/backoffice <code>schema.prisma</code>,
+    <code>speaking</code> 스키마 read-only introspection(2026-06-21), <code>스피킹모듈 데이터 샘플_최종.xlsx</code>(module_questions 21행).
+    실행 DDL: <code>apps/api/prisma/manual-sql/2026-06-21_speaking-user-data-tables.sql</code>.
+  </p>
+
+</div>
+</body>
+</html>
