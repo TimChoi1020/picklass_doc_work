@@ -266,7 +266,7 @@ KPI 카탈로그에 사전 정의. 핵심 KPI는 5점, 보조 KPI는 1점.
 
 | KPI 예시 | 중요도 | 사유 |
 |---|---|---|
-| FLUENCY_WPM | 5 | Speaking 핵심 측정값 |
+| SPEAKING_RATE | 5 | Speaking 핵심 측정값(구 FLUENCY_WPM) |
 | GRAMMAR_ERROR | 4 | 문법 정확성 핵심 |
 | HESITATION_FREQ | 2 | 보조 신호 |
 | RE_UTTERANCE | 1 | 부수 정보 |
@@ -310,7 +310,7 @@ weight = importance × confidence × recency
 
 | KPI | 정규화 | 중요도 | 신뢰도 | 시간 가중 | 최종 가중치 | 기여 |
 |---|---|---|---|---|---|---|
-| FLUENCY_WPM | 72 | 5 | 0.9 | 1.0 | 4.5 | 324 |
+| SPEAKING_RATE | 72 | 5 | 0.9 | 1.0 | 4.5 | 324 |
 | SILENCE_RATIO | 85 | 4 | 0.8 | 1.0 | 3.2 | 272 |
 | HESITATION_FREQ | 60 | 2 | 1.0 | 0.7 | 1.4 | 84 |
 | **합계** |  |  |  |  | **9.1** | **680** |
@@ -425,7 +425,7 @@ PPS: 73 (확정) | 베이스라인 65 → +8 (4주)
 ```sql
 -- KPI 정의 카탈로그 (정규화·가중치 사전 정의)
 table kpi_definitions (
-  kpi_code pk,                  -- 'FLUENCY_WPM' 등 70 코드
+  kpi_code pk,                  -- 'SPEAKING_RATE' 등 70 코드
   capability enum,              -- 8대 역량 (Speaking/Reading/.../Pragmatics)
   unit varchar(20),             -- %, WPM, ms, count, score, ratio
   importance int,               -- 1~5
