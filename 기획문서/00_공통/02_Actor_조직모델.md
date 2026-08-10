@@ -136,6 +136,20 @@ interface Organization {
 | 7 | **Guardian** | 학부모 | Learner 계정 연결 | 자녀 진도 조회, 결제 — **Phase 1은 속성만** |
 | 8 | **Consumer** | 개인 구독자 | 없음 (B2C) | 개인 학습, 구독 결제 |
 
+##### 역할코드 매핑 (SSoT) — DB 코드(snake_case) ↔ 정본 Role(PascalCase)
+> Backoffice 등 구현 문서는 DB 코드(snake_case)를 쓴다. 아래 매핑이 정본이며, 문서 간 역할 지칭은 이 표를 기준으로 해석한다.
+
+| DB 코드 (snake_case) | 정본 Role (PascalCase) | 비고 |
+|---|---|---|
+| `system_admin` | PlatformAdmin | |
+| `partner_admin` | PartnerAdmin | |
+| `group_admin` | GroupAdmin | |
+| `academy_admin` | InstitutionAdmin | `academy_admin`은 sector-neutral **InstitutionAdmin**의 DB 코드명(Academy 편향 아님, Enterprise/K12 포괄) |
+| `teacher` | Instructor | |
+| `student` | Learner | |
+
+> ⚠️ Backoffice는 B2B 6역할만 관리(Guardian/Consumer는 B2C 대상으로 관리 범위 밖).
+
 #### 4.4.1 B2B 제휴 데이터 처리 정책 *(v0.17 신설)*
 
 B2B 제휴 모드(§16)에서는 **파트너사가 자체 회원 시스템을 운영**하므로, picklass는 학습 진행에 필요한 최소 데이터만 외부에서 수신·저장한다.

@@ -9,28 +9,28 @@
 
 | 기능ID | 기능명 | 화면 | 정책 | 예외 | 상태 |
 |---|---|---|---|---|---|
-| SP-F-010 | 홈 오늘의 학습 | PKS-HM-001 | P-006 | E-006 | ✅ 부분 |
-| SP-F-011 | 홈 학습현황(이수율·발화량) | PKS-HM-001 | P-004 | E-006 | ✅ 부분(Mock 잔존) |
-| SP-F-012 | 홈 스피킹 밸런스(레이더) | PKS-HM-001 | P-002 | E-006 | ✅ 사용자폴리곤/평균 Mock |
-| SP-F-020 | 수업 과정·레슨 조회 | PKS-CL-001 | P-006 | E-001 | ✅ |
-| SP-F-021 | 과정 선택/변경 | PKS-CL-002 | P-006 | — | ✅ |
-| SP-F-022 | FRT 시작 | PKS-CL-001 | P-006, P-007 | E-005 | ✅ 생성/⚠️플레이어 |
-| SP-F-023 | 과정 탐색 | PKS-CL-003 | P-006 | E-006 | ✅ 조건부 |
-| SP-F-030 | 챌린지 발화량 통계 | PKS-CH-001 | P-004 | — | ✅ 헤드라인/⚠️시계열 Mock |
-| SP-F-031 | 복습 퀴즈(문장 마스터리) | PKS-FL-004 | P-009 | E-003, E-004 | ⚠️ 스켈레톤 |
-| SP-F-032 | 표현 노트 | PKS-FL-005 | P-009 | E-006 | ⚠️ 스켈레톤 |
+| SP-F-010 | 홈 오늘의 학습 | PKS-HM-001 | SP-P-006 | SP-E-006 | ✅ 부분 |
+| SP-F-011 | 홈 학습현황(이수율·발화량) | PKS-HM-001 | SP-P-004 | SP-E-006 | ✅ 부분(Mock 잔존) |
+| SP-F-012 | 홈 스피킹 밸런스(레이더) | PKS-HM-001 | SP-P-002 | SP-E-006 | ✅ 사용자폴리곤/평균 Mock |
+| SP-F-020 | 수업 과정·레슨 조회 | PKS-CL-001 | SP-P-006 | SP-E-001 | ✅ |
+| SP-F-021 | 과정 선택/변경 | PKS-CL-002 | SP-P-006 | — | ✅ |
+| SP-F-022 | FRT 시작 | PKS-CL-001 | SP-P-006, SP-P-007 | SP-E-005 | ✅ 생성/⚠️플레이어 |
+| SP-F-023 | 과정 탐색 | PKS-CL-003 | SP-P-006 | SP-E-006 | ✅ 조건부 |
+| SP-F-030 | 챌린지 발화량 통계 | PKS-CH-001 | SP-P-004 | — | ✅ 헤드라인/⚠️시계열 Mock |
+| SP-F-031 | 복습 퀴즈(문장 마스터리) | PKS-FL-004 | SP-P-009 | SP-E-003, SP-E-004 | ⚠️ 스켈레톤 |
+| SP-F-032 | 표현 노트 | PKS-FL-005 | SP-P-009 | SP-E-006 | ⚠️ 스켈레톤 |
 | SP-F-033 | 배지·랭킹 | PKS-CH-002~003 | — | — | ⚠️ Mock |
-| SP-F-040 | 리포트 종합 | PKS-RP-001 | P-004 | E-006 | ⚠️ P0 데이터 대기 |
-| SP-F-041 | 약점 분석 | PKS-RP-001 | P-002 | — | ✅ |
+| SP-F-040 | 리포트 종합 | PKS-RP-001 | SP-P-004 | SP-E-006 | ⚠️ P0 데이터 대기 |
+| SP-F-041 | 약점 분석 | PKS-RP-001 | SP-P-002 | — | ✅ |
 | SP-F-042 | 레슨별 리포트 | PKS-RP-002/004 | — | — | ✅ |
-| SP-F-043 | 1MP 갤러리 | PKS-RP-003/005 | — | E-006 | ⚠️ 준비중 |
-| SP-F-050 | MY 프로필·레벨 | PKS-MY-001 | P-002 | — | ✅ |
-| SP-F-051 | 수강 내역 | PKS-MY-003 | P-006 | E-006 | ✅ |
-| SP-F-052 | 설정류(닉네임/볼륨/시간/알림/페르소나) | PKS-MY-002~009 | P-007, P-008 | — | ✅ |
-| SP-F-060 | 정규 학습 5단계 | PKS-FL-002 | P-002 | E-003 | ⚠️ 외주범위 |
-| SP-F-061 | FRT 대화 | PKS-FL-003 | P-005 | E-003 | ⚠️ 스켈레톤 |
-| SP-F-070 | 레벨테스트 P-ALT | PKS-LV-002 | P-003 | E-005 | ⚠️ 빈 스텁 |
-| SP-F-071 | 레벨테스트 게이팅 | PKS-HM-001 | P-001 | E-005 | ✅ 상태연동 |
+| SP-F-043 | 1MP 갤러리 | PKS-RP-003/005 | — | SP-E-006 | ⚠️ 준비중 |
+| SP-F-050 | MY 프로필·레벨 | PKS-MY-001 | SP-P-002 | — | ✅ |
+| SP-F-051 | 수강 내역 | PKS-MY-003 | SP-P-006 | SP-E-006 | ✅ |
+| SP-F-052 | 설정류(닉네임/볼륨/시간/알림/페르소나) | PKS-MY-002~009 | SP-P-007, SP-P-008 | — | ✅ |
+| SP-F-060 | 정규 학습 5단계 | PKS-FL-002 | SP-P-002 | SP-E-003 | ⚠️ 외주범위 |
+| SP-F-061 | FRT 대화 | PKS-FL-003 | SP-P-005 | SP-E-003 | ⚠️ 스켈레톤 |
+| SP-F-070 | 레벨테스트 P-ALT | PKS-LV-002 | SP-P-003 | SP-E-005 | ⚠️ 빈 스텁 |
+| SP-F-071 | 레벨테스트 게이팅 | PKS-HM-001 | SP-P-001 | SP-E-005 | ✅ 상태연동 |
 
 ---
 
@@ -46,7 +46,7 @@
   - ☐ Given in-progress 0건, Then 정규 카드가 숨겨진다
   - ☐ Given active 과정 없음, Then FRT 카드가 잠기고 "수강 중인 과정 없음"을 표시한다
   - ⚠️ `분(minutes)`은 Mock(API 미제공)
-- **정책**: P-006 · **예외**: E-006
+- **정책**: SP-P-006 · **예외**: SP-E-006
 
 ### SP-F-011 · 학습현황 / SP-F-012 · 스피킹 밸런스
 - **동작**:
@@ -97,10 +97,10 @@
 - **동작**: 세션당 **6문장**(5~8), 문장별 1~2발화. 4단계(듣기→발화→평가→리워드). `GET /expressions/quiz?limit=6`(due) → `POST /expressions/:id/utterance {score?,tapMode?}` → 마지막 문장 → `POST /expressions/:id/complete-session`(망각곡선 `[1,2,4,7,16,35]`일 전진). 발음평가 Azure(tutoring `pronunciation.service` 차용). 종료 요약(발화수·레벨업·마스터·"발화량 챌린지 +N문장 반영").
 - **AC**:
   - ☐ Given due=0, Then S1 "복습 완료" + 표현노트 유도, 세션 진입 차단
-  - ☐ Given 문장 8회 발화 누적, Then Lv4(마스터) 도달(`mastery_target=8`, P-009)
+  - ☐ Given 문장 8회 발화 누적, Then Lv4(마스터) 도달(`mastery_target=8`, SP-P-009)
   - ☐ Given 세션 이탈, Then 진행분은 즉시 POST 저장(complete-session만 누락 시 다음 진입 보정)
   - ☐ Given 탭 모드, Then 발화량 ×0.6 가중
-- **정책**: P-009 · **예외**: E-003, E-004
+- **정책**: SP-P-009 · **예외**: SP-E-003, SP-E-004
 
 ### SP-F-032 · 표현 노트 (PKS-FL-005)
 - **동작**: `GET /expressions?filter=all|unlearned|master`, `POST /expressions`(source='note'). 단일 문장 섀도잉은 세션 엔진 재사용. 저장 = 단일 `user_expressions`(source `learning/note/preset`).
@@ -152,8 +152,8 @@
 - **동작(게이팅)**: `GET /levels/status` → `{requiresTest, testType, reason, enforcement, hasNickname, hasLevel}`. 팝오버 [시작하기]→`/onboarding/level-test`, [나중에]→닫기(hard_block이면 카드 잠금 유지).
 - **동작(P-ALT)**: P1 Vocab(4지선다 CAT) → P2 문장낭독(CAT) → P3 일상대화(6~10턴) → P4 주제발표(조건부). PT 완료 시 닉네임+레벨 동시 확보.
 - **AC**:
-  - ☐ Given 신규 사용자(진단 0건+레벨없음), Then hard_block → 수업 카드 잠금 + 수업 시작 403 `LEVEL_TEST_REQUIRED`(E-005)
+  - ☐ Given 신규 사용자(진단 0건+레벨없음), Then hard_block → 수업 카드 잠금 + 수업 시작 403 `LEVEL_TEST_REQUIRED`(SP-E-005)
   - ☐ Given soft_prompt, When [나중에], Then 24h 스누즈(localStorage)
-  - ☐ Given P3 6축 평균 조건, Then P4 진입/생략이 결정된다(P-003)
+  - ☐ Given P3 6축 평균 조건, Then P4 진입/생략이 결정된다(SP-P-003)
   - ⚠️ `onboarding/level-test/page.tsx`는 현재 빈 스텁
-- **정책**: P-001, P-003 · **예외**: E-005
+- **정책**: SP-P-001, SP-P-003 · **예외**: SP-E-005

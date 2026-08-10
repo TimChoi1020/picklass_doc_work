@@ -117,17 +117,17 @@
 | 3 | ruleRepeatWrongAnswer | 오답 1회(exact,maxAttempts≥2) → giveHint(direct) / 2회↑ → revealAnswer. audio/sentence-write 제외 |
 | 3b | ruleOfferHint | idle ≥ 20초 & 미답변/오답 → offerHint 버튼 |
 | 4a | ruleHolisticFeedback | holistic 제출 직후 → giveFeedback(holistic) LLM |
-| SHR-C | rulePronunciationFeedback | audio-record 제출 → giveFeedback(pronunciation, Azure) |
+| SHD-C | rulePronunciationFeedback | audio-record 제출 → giveFeedback(pronunciation, Azure) |
 | SWR-A | ruleWritingFeedback | writing-eval → giveFeedback(writing) |
 | 4c | ruleWrongAnswerFeedback | exact 첫 오답 → giveFeedback(correctness) |
 | 6 | ruleCompleteAfterCelebrate | celebrate+전체 답변 → completeModule |
-| SHR-A/B | rulePlayModelAudio / ruleStartRecordingAfterAudio | 발음 모듈 |
+| SHD-A/B | rulePlayModelAudio / ruleStartRecordingAfterAudio | 발음 모듈 |
 | 5 | ruleCorrectAnswer | 정답 판정, 마지막 문항 → celebrate |
 | 7 | ruleInitialEntry | greetingShown+무상호작용 → passageMode별 showPassage |
 | 7b | ruleClrIdle | sentence-explain → 항상 null |
 | 8 | rulePresentNextQuestion | 미답변 문항 → askQuestion |
 
-- **힌트 3레벨**: Level 0 button(학생 클릭) / Level 1 direct(오답 1회 자동) / Level 2 answer(오답 2회 revealAnswer). `questionMaxAttempts=Math.min(값,2)`(실질 최대 2회). SHR(발음): score<70 1차 button, 2차+ direct
+- **힌트 3레벨**: Level 0 button(학생 클릭) / Level 1 direct(오답 1회 자동) / Level 2 answer(오답 2회 revealAnswer). `questionMaxAttempts=Math.min(값,2)`(실질 최대 2회). SHD(발음): score<70 1차 button, 2차+ direct
 - **타임아웃**: idle 120초→참여도확인, 180초+저참여→리플래닝, offerHint 20초
 - **문항 표시 게이트**: 모든 모드에서 `activeQuestionId !== null` 전까지 미표시("Pickle AI가 문항을 준비 중이에요...")
 - ⚠️ `retryThreshold`(모듈 재도전 %) **미구현**(점수 무관 항상 완료). "오답률 50%" 판정은 planning 성공지표(모듈실패 score<50% ≤20%) 근거

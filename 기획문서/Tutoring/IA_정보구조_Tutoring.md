@@ -16,7 +16,7 @@
 
 **② 홈은 "액션 허브", 나의수업은 "관리 뷰"로 역할 분리.** 2026-04-10 개편의 핵심으로, 예전에는 홈에 전체 과정이 뒤섞여 있었으나, **홈(`/`)은 "오늘 이어서 할 레슨 1개"만 보여주는 즉시 실행 화면**으로, **나의수업(`/my-classes`)은 수강중·내가 만든·수강종료 과정을 모두 관리하는 뷰**로 나눴습니다. "지금 뭘 해야 하나?"와 "내 과정 전체를 보자"를 분리한 것입니다.
 
-**③ 데이터드리븐 모듈 렌더링.** IA에서 가장 중요한 설계 결정. 학습 화면은 모듈 종류마다 코드를 분기하지 않고, **DB의 두 필드(`passageMode`·`questionFlowMode`)로 화면 동작을 결정**합니다(§4.2). 덕분에 새 모듈을 코드 수정 없이 DB 등록만으로 추가할 수 있어, 학습 화면 IA가 콘텐츠 확장에 유연하게 대응합니다.
+**③ 데이터드리븐 모듈 렌더링.** IA에서 가장 중요한 설계 결정. 학습 화면은 모듈 종류마다 코드를 분기하지 않고, **DB 필드 조합(`passageMode`·`uiTemplate`·`questionFlowMode`·`questionCount`)으로 화면 동작을 결정**합니다(§4.2, 정본 06 TU-P-004). 덕분에 새 모듈을 코드 수정 없이 DB 등록만으로 추가할 수 있어, 학습 화면 IA가 콘텐츠 확장에 유연하게 대응합니다.
 
 **학습 흐름의 큰 그림**: 액세스코드로 과정을 등록 → 나의수업/홈에서 레슨 진입 → 모듈을 순서대로 학습(AI 오케스트레이터가 실시간 지도) → 레슨 완료 리포트 확인.
 
@@ -112,12 +112,12 @@
 
 ### 모듈별 세부 흐름
 - **PRD(예측)**: greet→미리보기 지문→essay→holistic 피드백(+전체 지문 공개)→celebrate
-- **SHR(쉐도잉)**: 모델 오디오(SHR-A)→녹음(SHR-B)→제출→발음 피드백(SHR-C)
+- **SHD(쉐도잉)**: 모델 오디오(SHD-A)→녹음(SHD-B)→제출→발음 피드백(SHD-C)
 - **SWR(영작)**: 지문→sentence-write(한글 패러프레이즈+textarea)→writing 피드백
 - **PWR(창작)**: Orchestrator 미사용, 4단계 수동(Outlining → Self-Check → 1st Draft → Final Draft)
 
 ### AI 오케스트레이터 규칙 우선순위 (학습 중 AI가 무엇을 할지 결정하는 규칙 순서)
-Rule 0 ruleGreet(첫 인사) → 1 ruleIdleCheck(120s 무응답) → 2 ruleDisengaged(180s+low) → 3 ruleRepeatWrongAnswer(오답 2회+ → 힌트) → 4a ruleHolisticFeedback(essay) → SHR-C 발음 / SWR-A 작문 피드백 → 4d 객관식 오답 → 5 ruleCompleteAfterCelebrate(오답률 ≥50% → 재계획) → SHR-A/B 오디오·녹음 → 6 정답 → 7 초기진입(showPassage) → 8 다음 문항
+Rule 0 ruleGreet(첫 인사) → 1 ruleIdleCheck(120s 무응답) → 2 ruleDisengaged(180s+low) → 3 ruleRepeatWrongAnswer(오답 2회+ → 힌트) → 4a ruleHolisticFeedback(essay) → SHD-C 발음 / SWR-A 작문 피드백 → 4d 객관식 오답 → 5 ruleCompleteAfterCelebrate(오답률 ≥50% → 재계획) → SHD-A/B 오디오·녹음 → 6 정답 → 7 초기진입(showPassage) → 8 다음 문항
 
 ---
 
@@ -130,18 +130,22 @@ ModulesPage (/modules/[lessonId])
  └ LessonSession (시퀀스 실행·결과 누적, usePassageMode)
     └ ModuleRunner key={currentModuleIdx}
        ├ ProcessWritingFlow            [PWR 전용] StepIndicator/ContentPanel/WritingPanel/FeedbackPanel
-       └ ModuleRunnerInner            [PRD·SHR·SWR 등]
+       └ ModuleRunnerInner            [PRD·SHD·SWR 등]
           ├ ModuleProgressBar (다중 모듈 시)
           ├ [Desktop lg+] 좌: ContentPanel+QuestionsPanel/VoiceQuestionPanel / 우: FeedbackPanel+AIQuestionPanel
           └ [Mobile <lg] 탭 Content/Questions/Voice + MobileSplitLayout + FeedbackPanel+AIQuestionPanel
 ```
 - 주요 패널: ContentPanel(지문) · QuestionsPanel(문항) · VoiceQuestionPanel(음성) · FeedbackPanel(AI 채팅·피드백) · AIQuestionPanel(자유 질문) · ModuleProgressBar · ModuleCompleteCard · TypewriterText
 
-### 데이터드리븐 렌더링 (IA의 핵심 설계 — uiTemplate switch 제거 → DB 필드 2개)
-**모듈 종류마다 화면 컴포넌트를 따로 만들지 않고, DB 필드 2개의 조합으로 화면 동작을 결정**합니다. 신규 모듈은 코드 변경 없이 DB 등록만으로 동작합니다.
+### 데이터드리븐 렌더링 (IA의 핵심 설계 — DB 필드 조합으로 화면 결정)
+> ⚠️ 레거시 문서: 렌더링 축의 정본은 **06 TU-P-004(4필드: passageMode·uiTemplate·questionFlowMode·questionCount)**. 아래 서술을 정본에 맞춰 갱신함(uiTemplate 활성 유지).
+
+**모듈 종류마다 화면 컴포넌트를 따로 만들지 않고, DB 필드 4개의 조합으로 화면 동작을 결정**합니다. 신규 모듈은 코드 변경 없이 DB 등록만으로 동작합니다.
 - **`passageMode`**(지문 패널 동작): `full` / `hidden` / `preview-then-reveal` / `timed-then-blur`
+- **`uiTemplate`**(문항 패널 레이아웃): `standard`(QuestionsPanel) / `voice`(VoiceQuestionPanel) / `embedded`(CLR) / `hidden`
 - **`questionFlowMode`**(문항 패널 동작): `sequential` / `deck`(카드 1장+시도 dots) / `locked-steps`(전체 표시+🔒)
-- 두 필드는 독립 조합 가능(DB `ai_modules` 컬럼)
+- **`questionCount`**(문항 수 제어)
+- 네 필드는 독립 조합 가능(DB `ai_modules` 컬럼)
 
 ### timed-then-blur 학습 화면 (SCN/SKM — 속독·스캐닝)
 지문을 일정 시간만 보여주고 가리는 훈련 화면. `blurActive`: `before`=blur → `reading`=공개 → `done+미제출`=blur 복원 → `done+제출`=해제. Floating Timer: `before`=전체 overlay(중앙 "지문읽기") / `reading`=헤더 우측 inline("읽기완료")
@@ -153,7 +157,7 @@ ModulesPage (/modules/[lessonId])
 | 코드 | 이름 | 답변유형 | 스킬 | 채점 | passageMode |
 |---|---|---|---|---|---|
 | PRD | Prediction(예측) | essay | reading | holistic | preview |
-| SHR | Shadow Reading(쉐도잉) | audio-record | speaking | pronunciation | full |
+| SHD | Shadowing(쉐도잉) | audio-record | speaking | pronunciation | full |
 | SWR | Sentence Writing(영작) | sentence-write | writing | holistic | full |
 | PWR | Process Writing(창작) | essay(4단계) | writing | holistic | full |
 | SCN | Scanning | keyword-chips/short-text | reading | holistic | timed-then-blur |
